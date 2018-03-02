@@ -56,6 +56,7 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
 
         let results = []
         if (query) {
+            // TODO: Add supportedFramework to query? Seems like a good idea but it doesn't seem to change results
             let result = await fetch("https://api-v2v3search-0.nuget.org/query?prerelease=false&q=" + query)
             var json = await result.json()
             results = json.data
