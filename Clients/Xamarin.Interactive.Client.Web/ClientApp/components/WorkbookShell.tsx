@@ -12,6 +12,7 @@ import { WorkbookEditor } from './WorkbookEditor'
 import { StatusBar } from './StatusBar'
 import { ResultRendererRegistry } from '../ResultRendererRegistry'
 import { NullRenderer } from '../renderers/NullRenderer'
+import { PackageSearch } from './PackageSearch';
 import './WorkbookShell.scss'
 
 export interface WorkbookShellContext {
@@ -52,7 +53,9 @@ export class WorkbookShell extends React.Component {
                 <WorkbookCommandBar />
                 <WorkbookEditor
                     shellContext={this.shellContext}
-                    content=''/>
+                    content='' />
+                <PackageSearch
+                    session={this.shellContext.session} />
                 <StatusBar
                     ref={(statusBar: StatusBar | null) => this.statusBar = statusBar} />
                 {/* <div style={{ display: "none" }}>
