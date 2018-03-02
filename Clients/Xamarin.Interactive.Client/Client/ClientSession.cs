@@ -648,6 +648,18 @@ namespace Xamarin.Interactive.Client
                 await LoadPackageIntegrationsAsync (package, cancellationToken);
         }
 
+        async Task RestorePackagesAsync (
+            IEnumerable<InteractivePackage> packages,
+            CancellationToken cancellationToken)
+        {
+            await Workbook.Packages.RestorePackagesAsync (packages, cancellationToken);
+
+            foreach (var package in Workbook.Packages.InstalledPackages) {
+                ReferencePackageInWorkspace (package);
+                ReferenceTopLevelPackage (package);
+            }
+        }
+
         public async Task InstallPackageAsync (
             PackageViewModel packageViewModel,
             CancellationToken cancellationToken = default (CancellationToken))
@@ -684,9 +696,10 @@ namespace Xamarin.Interactive.Client
             if (package == null)
                 return;
 
-            await ReferenceTopLevelPackageAsync (
-                package,
-                cancellationToken);
+            if (ReferenceTopLevelPackage (package)) {
+                EvaluationService.OutdateAllCodeCells ();
+                await EvaluationService.EvaluateAllAsync (cancellationToken);
+            }
         }
 
         async Task LoadPackageIntegrationsAsync (
@@ -765,14 +778,12 @@ namespace Xamarin.Interactive.Client
                     packageAssemblyReference.ParentDirectory);
         }
 
-        async Task ReferenceTopLevelPackageAsync (
-            InteractivePackage package,
-            CancellationToken cancellationToken)
+        bool ReferenceTopLevelPackage (InteractivePackage package)
         {
             if (package.AssemblyReferences.Count == 0)
-                return;
+                return false;
 
-            var referenceBuffer = new StringBuilder ();
+            var references = new List<string> ();
 
             foreach (var packageAssemblyReference in package.AssemblyReferences) {
                 var resolvedAssembly = CompilationWorkspace
@@ -788,28 +799,10 @@ namespace Xamarin.Interactive.Client
                 if (HasIntegration (resolvedAssembly))
                     continue;
 
-                if (referenceBuffer.Length > 0)
-                    referenceBuffer.AppendLine ();
-
-                referenceBuffer
-                    .Append ("#r \"")
-                    .Append (resolvedAssembly.AssemblyName.Name)
-                    .Append ("\"");
+                references.Add (resolvedAssembly.AssemblyName.Name);
             }
 
-            if (referenceBuffer.Length > 0)
-                await EvaluationService.EvaluateAsync (referenceBuffer.ToString (), cancellationToken);
-        }
-
-        async Task RestorePackagesAsync (
-            IEnumerable<InteractivePackage> packages,
-            CancellationToken cancellationToken)
-        {
-            await Workbook.Packages.RestorePackagesAsync (packages, cancellationToken);
-
-            Workbook.Packages
-                .InstalledPackages
-                .ForEach (ReferencePackageInWorkspace);
+            return EvaluationService.AddTopLevelReferences (references);
         }
 
         bool HasIntegration (ResolvedAssembly resolvedAssembly)

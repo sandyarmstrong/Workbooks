@@ -98,6 +98,9 @@ namespace Xamarin.Interactive.CodeAnalysis
         public Task EvaluateAllAsync (CancellationToken cancellationToken = default)
             => throw new NotImplementedException ();
 
+        public bool AddTopLevelReferences (IReadOnlyList<string> references)
+            => throw new NotImplementedException ();
+
         #endregion
 
         #region Agent Messages
