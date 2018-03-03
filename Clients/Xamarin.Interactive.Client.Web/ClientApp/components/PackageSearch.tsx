@@ -38,7 +38,7 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
 
             <select
                 className="form-control"
-                size={10}
+                size={this.state.query.length > 0 ? 10 : 0}
                 onChange={event => this.onSelectedPackageChanged(event)}>
             {
                 this.state.results.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
