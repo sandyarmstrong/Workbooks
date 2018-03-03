@@ -5,6 +5,10 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner'
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
 import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog'
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox'
+import { List } from 'office-ui-fabric-react/lib/List'
+import { Image, ImageFit } from 'office-ui-fabric-react/lib/Image'
+
+import './PackageSearch.scss'
 
 interface PackageSearchProps {
     session: WorkbookSession
@@ -15,11 +19,14 @@ interface PackageSearchState {
     results: PackageViewModel[]
     selectedPackage?: PackageViewModel
     inProgress: boolean
+    installedPackagesIds: string[]
 }
 
 interface PackageViewModel {
     id: string
     version: string
+    iconUrl: string
+    description: string
 }
 
 export class PackageSearch extends React.Component<PackageSearchProps, PackageSearchState> {
@@ -28,7 +35,8 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
         this.state = {
             query: "",
             results: [],
-            inProgress: false
+            inProgress: false,
+            installedPackagesIds: []
         }
     }
 
@@ -39,36 +47,109 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
                 dialogContentProps={{
                     type: DialogType.largeHeader,
                     title: "Add NuGet Packages",
-                    subText: "some explanatory text"
+                    subText: "NuGet is the package manager for .NET. Find the library you need from millions of popular packages.",
+                    className: "packageManagerDialog"
                 }}
                 modalProps={{
                     isBlocking: true
                 }}>
 
                 <SearchBox
-                    labelText="Search NuGet"
+                    placeholder="Search NuGet"
                     onChange={event => this.onSearchFieldChanged(event)} />
 
-                <select
-                    className="form-control"
-                    size={this.state.query.length > 0 ? 10 : 0}
-                    onChange={event => this.onSelectedPackageChanged(event)}>
-                {
-                    this.state.results.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
-                }
-                </select>
-
-                <DialogFooter>
-                    <PrimaryButton
-                        disabled={this.state.inProgress}
-                        text="Install"
-                        onClick={() => this.installSelectedPackage()}/>
+                <div className="packageListContainer">
+                    {/*
+                    I wanted to use Fabric List but individual cells weren't rerendering on state changes
+                    <List
+                        // className="form-control"
+                        // size={this.state.query.length > 0 ? 10 : 0}
+                        // onChange={event => this.onSelectedPackageChanged(event)}
+                        items={this.state.results}
+                        onRenderCell={(item, index, isScrolling) => this._onRenderCell(item, index, isScrolling)}
+                    /> */}
                     {
-                        this.state.inProgress ? <Spinner label="Installing..." /> : null
+                        this.state.results.map(item => (
+                            <div className="packageListItemContainer">
+                            <div className="packageListItem">
+                                <Image
+                                    className="packageListItemIcon"
+                                    width={ 50 }
+                                    // imageFit={ImageFit.contain}
+                                    src={item.iconUrl} />
+                                <div className="packageListInfoContainer">
+                                    <div className="packageListItemName">
+                                        {item.id}
+                                    </div>
+                                    <div className="packageListItemVersion">
+                                        {item.version}
+                                    </div>
+                                    <div className="packageListItemDescription">
+                                        {item.description}
+                                        </div>
+                                    <div className="packageListActionContainer">
+                                            <PrimaryButton
+                                                className="packageInstallButton"
+                                                text={this.isPackageInstalled(item) ? "installed" : "Install"}
+                                                disabled={this.state.inProgress || this.isPackageInstalled(item)}
+                                                onClick={() => this.installPackage(item)}
+                                            />
+                                            {
+                                                this.state.inProgress && this.state.selectedPackage === item ?
+                                                    <Spinner className="packageInstallSpinner" size={SpinnerSize.medium} /> :
+                                                    null
+                                            }
+                                    </div>
+                                </div>
+                                </div>
+                            <hr />
+                            </div>
+                        ))
                     }
-                </DialogFooter>
+                </div>
             </Dialog>
         </div>
+    }
+
+    // private _onRenderCell(item?: any, index?: number, isScrolling?: boolean): React.ReactNode {
+    //     return (
+    //         <div className="packageListItemContainer">
+    //         <div className="packageListItem">
+    //             <Image
+    //                 className="packageListItemIcon"
+    //                 width={ 50 }
+    //                 // imageFit={ImageFit.contain}
+    //                 src={item.iconUrl} />
+    //             <div className="packageListInfoContainer">
+    //                 <div className="packageListItemName">
+    //                     {item.id}
+    //                 </div>
+    //                 <div className="packageListItemVersion">
+    //                     {item.version}
+    //                 </div>
+    //                 <div className="packageListItemDescription">
+    //                     {item.description}
+    //                     </div>
+    //                 <div className="packageListActionContainer">
+    //                         <PrimaryButton
+    //                             className="packageInstallButton"
+    //                             text={this.isPackageInstalled(item) ? "installed" : "Install"}
+    //                             disabled={this.state.inProgress || this.isPackageInstalled(item)}
+    //                             onClick={() => this.installPackage(item)}
+    //                         />
+    //                 {
+    //                     this.state.inProgress ? <Spinner size={SpinnerSize.small} label="Installing..." /> : null
+    //                         }
+    //                 </div>
+    //             </div>
+    //             </div>
+    //         <hr />
+    //         </div>
+    //     )
+    // }
+
+    isPackageInstalled(pkg: PackageViewModel): boolean {
+        return this.state.installedPackagesIds.find(id => id === pkg.id) !== undefined
     }
 
     async onSearchFieldChanged(input: string) {
@@ -88,23 +169,34 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
         })
     }
 
-    onSelectedPackageChanged(event: React.ChangeEvent<HTMLSelectElement>) {
-        let packageId = event.target.value as string
-        let selectedPackage = this.state.results.filter(p => p.id === packageId)[0]
-        this.setState({ selectedPackage: selectedPackage })
-    }
+    // onSelectedPackageChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+    //     let packageId = event.target.value as string
+    //     let selectedPackage = this.state.results.filter(p => p.id === packageId)[0]
+    //     this.setState({ selectedPackage: selectedPackage })
+    // }
 
     async installSelectedPackage() {
-        if (!this.state.selectedPackage || this.state.inProgress)
+        await this.installPackage(this.state.selectedPackage)
+    }
+
+    async installPackage(pkg: PackageViewModel|undefined) {
+        if (!pkg || this.state.inProgress)
             return
 
-        this.setState({ inProgress: true })
+        this.setState({
+            inProgress: true,
+            selectedPackage: pkg
+        })
 
-        console.log(this.state.selectedPackage)
-        await this.props.session.installPackage(
-            this.state.selectedPackage.id,
-            this.state.selectedPackage.version)
+        console.log(pkg)
+        let installedPackageIds = await this.props.session.installPackage(
+            pkg.id,
+            pkg.version)
 
-        this.setState({ inProgress: false })
+        this.setState({
+            inProgress: false,
+            installedPackagesIds: installedPackageIds,
+            selectedPackage: undefined
+        })
     }
 }

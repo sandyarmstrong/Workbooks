@@ -148,17 +148,26 @@ namespace Xamarin.Interactive.Client.Web
         }
 
         // TODO: Probably want package source URL, too
-        public Task InstallPackage (string id, string version)
+        public async Task<List<string>> InstallPackage (string id, string version)
         {
             var sessionState = serviceProvider
                 .GetInteractiveSessionHubManager ()
                 .GetSession (Context.ConnectionId);
 
-            return sessionState.ClientSession.InstallPackageAsync (
+            await sessionState.ClientSession.InstallPackageAsync (
                 new PackageViewModel (new PackageIdentity (
                     id,
                     new NuGetVersion (version))),
                 Context.Connection.ConnectionAbortedToken);
+
+            // TODO: Probably want to return a more detailed VM, not just IDs
+            return sessionState
+                .ClientSession
+                .Workbook
+                .Packages
+                .InstalledPackages
+                .Select (p => p.Identity.Id)
+                .ToList ();
         }
 
         public async Task<List<MonacoCompletionItem>> ProvideCompletions (

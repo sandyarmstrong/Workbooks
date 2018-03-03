@@ -103,7 +103,7 @@ export class WorkbookSession {
         return this.hubConnection.invoke("ProvideSignatureHelp", codeCellId, lineNumber, column)
     }
 
-    installPackage(packageId: string, version: string) {
+    installPackage(packageId: string, version: string): Promise<string[]> {
         return this.hubConnection.invoke("InstallPackage", packageId, version)
     }
 }

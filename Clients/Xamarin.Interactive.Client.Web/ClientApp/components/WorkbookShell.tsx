@@ -51,11 +51,11 @@ export class WorkbookShell extends React.Component {
         return (
             <div className='WorkbookShell-container'>
                 <WorkbookCommandBar />
+                <PackageSearch
+                    session={this.shellContext.session} />
                 <WorkbookEditor
                     shellContext={this.shellContext}
                     content='' />
-                <PackageSearch
-                    session={this.shellContext.session} />
                 <StatusBar
                     ref={(statusBar: StatusBar | null) => this.statusBar = statusBar} />
                 {/* <div style={{ display: "none" }}>
