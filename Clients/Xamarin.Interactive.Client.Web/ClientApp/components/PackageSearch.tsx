@@ -11,6 +11,8 @@ import './PackageSearch.scss'
 
 interface PackageSearchProps {
     session: WorkbookSession
+    getIsHidden: () => boolean
+    notifyDismiss: () => void
 }
 
 interface PackageSearchState {
@@ -35,22 +37,24 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
             query: "",
             results: [],
             inProgress: false,
-            installedPackagesIds: []
+            installedPackagesIds: [],
         }
     }
 
     public render() {
         return <div>
             <Dialog
-                hidden={false}
+                hidden={this.props.getIsHidden()}
                 dialogContentProps={{
                     type: DialogType.largeHeader,
                     title: "Add NuGet Packages",
                     subText: "NuGet is the package manager for .NET. Find the library you need from millions of popular packages.",
-                    className: "packageManagerDialog"
+                    className: "packageManagerDialog",
+                    showCloseButton: true
                 }}
                 modalProps={{
-                    isBlocking: true
+                    isBlocking: this.state.inProgress,
+                    onDismiss: () => this.notifyDismiss()
                 }}>
 
                 <SearchBox
@@ -154,5 +158,15 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
             installedPackagesIds: installedPackageIds,
             selectedPackage: undefined
         })
+    }
+
+    notifyDismiss() {
+        this.setState({
+            inProgress: false,
+            selectedPackage: undefined,
+            results: [],
+            query: ""
+        })
+        this.props.notifyDismiss()
     }
 }

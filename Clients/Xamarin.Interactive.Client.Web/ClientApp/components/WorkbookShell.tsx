@@ -20,7 +20,11 @@ export interface WorkbookShellContext {
     rendererRegistry: ResultRendererRegistry
 }
 
-export class WorkbookShell extends React.Component {
+interface WorkbookShellState {
+    isPackageDialogHidden: boolean
+}
+
+export class WorkbookShell extends React.Component<any, WorkbookShellState> {
     private shellContext: WorkbookShellContext
     private statusBar: StatusBar | null = null
 
@@ -29,6 +33,9 @@ export class WorkbookShell extends React.Component {
         this.shellContext = {
             session: new WorkbookSession(this.statusUIAction),
             rendererRegistry: new ResultRendererRegistry
+        }
+        this.state = {
+            isPackageDialogHidden: true
         }
 
         this.shellContext.rendererRegistry.register(NullRenderer.factory)
@@ -47,12 +54,25 @@ export class WorkbookShell extends React.Component {
         this.shellContext.session.disconnect()
     }
 
+    showPackageDialog() {
+        this.setState({ isPackageDialogHidden: false })
+    }
+
+    hidePackageDialog() {
+        this.setState({ isPackageDialogHidden: true })
+    }
+
     render() {
         return (
             <div className='WorkbookShell-container'>
-                <WorkbookCommandBar />
+                <WorkbookCommandBar
+                    addPackages={() => this.showPackageDialog()}
+                />
                 <PackageSearch
-                    session={this.shellContext.session} />
+                    session={this.shellContext.session}
+                    notifyDismiss={() => this.hidePackageDialog()}
+                    getIsHidden={() => this.state.isPackageDialogHidden}
+                />
                 <WorkbookEditor
                     shellContext={this.shellContext}
                     content='' />
