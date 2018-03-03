@@ -441,11 +441,13 @@ namespace Xamarin.Interactive.Workbook.Models
                 ClientSession.CompilationWorkspace.EvaluationContextId);
         }
 
-        public bool AddTopLevelReferences (IReadOnlyList<string> references)
+        public Task<bool> AddTopLevelReferencesAsync (
+            IReadOnlyList<string> references,
+            CancellationToken cancellationToken = default)
         {
             // TODO: soo.....why are new #r's added after there are other cells not bringing in the reference right?
             if (references == null || references.Count == 0)
-                return false;
+                return Task.FromResult (false);
 
             // TODO: Should we be saving a quick reference to the hidden cell/editor?
             var hiddenCellState = CodeCells
@@ -469,7 +471,7 @@ namespace Xamarin.Interactive.Workbook.Models
             }
 
             hiddenCellState.Cell.Buffer.Value = builder.ToString ();
-            return true;
+            return Task.FromResult (true);
         }
 
         public async Task EvaluateAllAsync (CancellationToken cancellationToken = default)

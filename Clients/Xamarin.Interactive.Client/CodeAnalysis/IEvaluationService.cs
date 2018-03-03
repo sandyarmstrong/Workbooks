@@ -20,6 +20,8 @@ namespace Xamarin.Interactive.CodeAnalysis
         Task EvaluateAsync (string input, CancellationToken cancellationToken = default);
         Task EvaluateAllAsync (CancellationToken cancellationToken = default);
         Task LoadWorkbookDependencyAsync (string dependency, CancellationToken cancellationToken = default);
-        bool AddTopLevelReferences (IReadOnlyList<string> references);
+        Task<bool> AddTopLevelReferencesAsync (
+            IReadOnlyList<string> references,
+            CancellationToken cancellationToken = default);
     }
 }

@@ -14,6 +14,7 @@ interface PackageSearchState {
 
 interface PackageViewModel {
     id: string
+    version: string
 }
 
 export class PackageSearch extends React.Component<PackageSearchProps, PackageSearchState> {
@@ -40,7 +41,7 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
                 size={10}
                 onChange={event => this.onSelectedPackageChanged(event)}>
             {
-                this.state.results.map(p => <option value={p.id}>{p.id}</option>)
+                this.state.results.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
             }
             </select>
 
@@ -74,6 +75,11 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
     }
 
     installSelectedPackage() {
+        if (!this.state.selectedPackage)
+            return
         console.log(this.state.selectedPackage)
+        this.props.session.installPackage(
+            this.state.selectedPackage.id,
+            this.state.selectedPackage.version)
     }
 }

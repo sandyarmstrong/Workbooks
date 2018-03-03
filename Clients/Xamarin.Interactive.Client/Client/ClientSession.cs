@@ -656,7 +656,7 @@ namespace Xamarin.Interactive.Client
 
             foreach (var package in Workbook.Packages.InstalledPackages) {
                 ReferencePackageInWorkspace (package);
-                ReferenceTopLevelPackage (package);
+                await ReferenceTopLevelPackageAsync (package, cancellationToken);
             }
         }
 
@@ -696,7 +696,7 @@ namespace Xamarin.Interactive.Client
             if (package == null)
                 return;
 
-            if (ReferenceTopLevelPackage (package)) {
+            if (await ReferenceTopLevelPackageAsync (package, cancellationToken)) {
                 EvaluationService.OutdateAllCodeCells ();
                 await EvaluationService.EvaluateAllAsync (cancellationToken);
             }
@@ -778,7 +778,9 @@ namespace Xamarin.Interactive.Client
                     packageAssemblyReference.ParentDirectory);
         }
 
-        bool ReferenceTopLevelPackage (InteractivePackage package)
+        async Task<bool> ReferenceTopLevelPackageAsync (
+            InteractivePackage package,
+            CancellationToken cancellationToken)
         {
             if (package.AssemblyReferences.Count == 0)
                 return false;
@@ -802,7 +804,7 @@ namespace Xamarin.Interactive.Client
                 references.Add (resolvedAssembly.AssemblyName.Name);
             }
 
-            return EvaluationService.AddTopLevelReferences (references);
+            return await EvaluationService.AddTopLevelReferencesAsync (references, cancellationToken);
         }
 
         bool HasIntegration (ResolvedAssembly resolvedAssembly)
