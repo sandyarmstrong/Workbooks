@@ -2,10 +2,9 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { WorkbookSession } from '../WorkbookSession'
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner'
-import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
-import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog'
+import { PrimaryButton } from 'office-ui-fabric-react/lib/Button'
+import { Dialog, DialogType } from 'office-ui-fabric-react/lib/Dialog'
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox'
-import { List } from 'office-ui-fabric-react/lib/List'
 import { Image, ImageFit } from 'office-ui-fabric-react/lib/Image'
 
 import './PackageSearch.scss'
@@ -111,43 +110,6 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
         </div>
     }
 
-    // private _onRenderCell(item?: any, index?: number, isScrolling?: boolean): React.ReactNode {
-    //     return (
-    //         <div className="packageListItemContainer">
-    //         <div className="packageListItem">
-    //             <Image
-    //                 className="packageListItemIcon"
-    //                 width={ 50 }
-    //                 // imageFit={ImageFit.contain}
-    //                 src={item.iconUrl} />
-    //             <div className="packageListInfoContainer">
-    //                 <div className="packageListItemName">
-    //                     {item.id}
-    //                 </div>
-    //                 <div className="packageListItemVersion">
-    //                     {item.version}
-    //                 </div>
-    //                 <div className="packageListItemDescription">
-    //                     {item.description}
-    //                     </div>
-    //                 <div className="packageListActionContainer">
-    //                         <PrimaryButton
-    //                             className="packageInstallButton"
-    //                             text={this.isPackageInstalled(item) ? "installed" : "Install"}
-    //                             disabled={this.state.inProgress || this.isPackageInstalled(item)}
-    //                             onClick={() => this.installPackage(item)}
-    //                         />
-    //                 {
-    //                     this.state.inProgress ? <Spinner size={SpinnerSize.small} label="Installing..." /> : null
-    //                         }
-    //                 </div>
-    //             </div>
-    //             </div>
-    //         <hr />
-    //         </div>
-    //     )
-    // }
-
     isPackageInstalled(pkg: PackageViewModel): boolean {
         return this.state.installedPackagesIds.find(id => id === pkg.id) !== undefined
     }
@@ -168,12 +130,6 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
             results: results
         })
     }
-
-    // onSelectedPackageChanged(event: React.ChangeEvent<HTMLSelectElement>) {
-    //     let packageId = event.target.value as string
-    //     let selectedPackage = this.state.results.filter(p => p.id === packageId)[0]
-    //     this.setState({ selectedPackage: selectedPackage })
-    // }
 
     async installSelectedPackage() {
         await this.installPackage(this.state.selectedPackage)
