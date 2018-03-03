@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { WorkbookSession } from '../WorkbookSession'
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner'
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button'
+import { Dialog, DialogType, DialogFooter } from 'office-ui-fabric-react/lib/Dialog'
+import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox'
 
 interface PackageSearchProps {
     session: WorkbookSession
@@ -10,6 +14,7 @@ interface PackageSearchState {
     query: string
     results: PackageViewModel[]
     selectedPackage?: PackageViewModel
+    inProgress: boolean
 }
 
 interface PackageViewModel {
@@ -22,38 +27,53 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
         super(props)
         this.state = {
             query: "",
-            results: []
+            results: [],
+            inProgress: false
         }
     }
 
     public render() {
         return <div>
-            <h2>Add Packages</h2>
+            <Dialog
+                hidden={false}
+                dialogContentProps={{
+                    type: DialogType.largeHeader,
+                    title: "Add NuGet Packages",
+                    subText: "some explanatory text"
+                }}
+                modalProps={{
+                    isBlocking: true
+                }}>
 
-            <input
-                className="form-control"
-                type="text"
-                placeholder="Search NuGet"
-                onChange={event => this.onSearchFieldChanged(event)} />
+                <SearchBox
+                    labelText="Search NuGet"
+                    onChange={event => this.onSearchFieldChanged(event)} />
 
-            <select
-                className="form-control"
-                size={this.state.query.length > 0 ? 10 : 0}
-                onChange={event => this.onSelectedPackageChanged(event)}>
-            {
-                this.state.results.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
-            }
-            </select>
+                <select
+                    className="form-control"
+                    size={this.state.query.length > 0 ? 10 : 0}
+                    onChange={event => this.onSelectedPackageChanged(event)}>
+                {
+                    this.state.results.map(p => <option key={p.id} value={p.id}>{p.id}</option>)
+                }
+                </select>
 
-            <button
-                className="btn-primary btn-small"
-                onClick={() => this.installSelectedPackage()}>Install</button>
+                <DialogFooter>
+                    <PrimaryButton
+                        disabled={this.state.inProgress}
+                        text="Install"
+                        onClick={() => this.installSelectedPackage()}/>
+                    {
+                        this.state.inProgress ? <Spinner label="Installing..." /> : null
+                    }
+                </DialogFooter>
+            </Dialog>
         </div>
     }
 
-    async onSearchFieldChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    async onSearchFieldChanged(input: string) {
         // TODO: Cancellation or at least ignoring of results we no longer care about (as we type)
-        let query = event.target.value.trim()
+        let query = input.trim()
 
         let results = []
         if (query) {
@@ -74,12 +94,17 @@ export class PackageSearch extends React.Component<PackageSearchProps, PackageSe
         this.setState({ selectedPackage: selectedPackage })
     }
 
-    installSelectedPackage() {
-        if (!this.state.selectedPackage)
+    async installSelectedPackage() {
+        if (!this.state.selectedPackage || this.state.inProgress)
             return
+
+        this.setState({ inProgress: true })
+
         console.log(this.state.selectedPackage)
-        this.props.session.installPackage(
+        await this.props.session.installPackage(
             this.state.selectedPackage.id,
             this.state.selectedPackage.version)
+
+        this.setState({ inProgress: false })
     }
 }
