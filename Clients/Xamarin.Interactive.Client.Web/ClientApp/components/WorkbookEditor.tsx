@@ -47,6 +47,9 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(Map({
     }
 }));
 
+type DraftBlockType = "header-one" | "header-two" | "header-three" | "header-four" | "header-five" | "header-six" | "blockquote" | "code-block" | "atomic"
+| "unordered-list-item" | "ordered-list-item" | "unstyled";
+
 export class WorkbookEditor extends React.Component<WorkbooksEditorProps, WorkbooksEditorState> implements MonacoCellMapper {
     subscriptors: ((m: EditorMessage) => void)[];
     monacoProviderTickets: monaco.IDisposable[] = [];
@@ -111,9 +114,8 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
             let lastBlock = currentContent.getBlocksAsArray().slice(-1)[0];
 
             if (lastBlock.getType() === "code-block") {
-                lastBlock = this.createNewEmptyBlock(currentContent, false, false);
-                const contentState = ContentState.createFromBlockArray(currentContent.getBlocksAsArray().concat([lastBlock]), undefined);
-                editorState = EditorState.push(editorState, contentState, "insert-fragment");
+                lastBlock = this.createNewEmptyBlock("unstyled");
+                editorState = this.insertBlockIntoState(lastBlock, "last", false);
             }
 
             const nextSelection = (SelectionState.createEmpty(lastBlock.getKey())
@@ -121,7 +123,7 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
                 .set('focusOffset', lastBlock.getText().length) as SelectionState);
 
             editorState = EditorState.forceSelection(editorState, nextSelection);
-            this.setState({ editorState });
+            this.onChange(editorState);
         }
     }
 
@@ -194,9 +196,7 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
         const newBlock = block.set("data", newBlockData) as ContentBlock;
         const newBlockMap = content.getBlockMap().set(currentBlock, newBlock);
         const newContent = ContentState.createFromBlockArray(newBlockMap.toArray());
-        this.setState({
-            editorState: EditorState.push(this.state.editorState, newContent, "change-block-data"),
-        });
+        this.onChange(EditorState.push(this.state.editorState, newContent, "change-block-data"));
     }
 
     getPreviousCodeBlock(currentBlock: string) {
@@ -208,100 +208,78 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
     }
 
     setUpInitialState(): any {
-        const newBlocks = convertFromHTML("<h1>Welcome to Workbooks!</h1>").contentBlocks.concat([
-            new ContentBlock({
-                key: genKey(),
-                type: "code-block",
-                text: "",
-                characterList: List()
-            })
-        ])
+        const newBlocks = convertFromHTML("<h1>Welcome to Workbooks!</h1>").contentBlocks.concat(
+            this.createNewEmptyBlock("code-block"))
 
         const newContentState = ContentState.createFromBlockArray(newBlocks);
         const newEditorState = EditorState.createWithContent(newContentState);
         this.onChange(newEditorState);
     }
 
-    // TODO: This should just be a special case of createNewEmptyBlock. Clean up ASAP
     appendNewCodeCell() {
-        let currentContent = this.state.editorState.getCurrentContent()
-
-        // Empty block in between cells looks nicer
-        const lastBlock = currentContent.getBlocksAsArray().slice(-1)[0];
+        const lastBlock = this.state.editorState.getCurrentContent().getBlocksAsArray().slice(-1)[0];
+        let editorState = this.state.editorState;
         if (lastBlock.getType() === "code-block")
-            this.createNewEmptyBlock(currentContent, false)
-
-        currentContent = this.state.editorState.getCurrentContent()
-
-        const newBlock = new ContentBlock({
-            key: genKey(),
-            type: "code-block",
-            text: "",
-            characterList: List()
-        })
-
-        const newBlockMap = currentContent.getBlockMap().set(newBlock.getKey(), newBlock)
-        const blockArray = newBlockMap.toArray()
-
-        const contentState = ContentState.createFromBlockArray(blockArray)
-
-        this.onChange(EditorState.push(
-            this.state.editorState,
-            contentState,
-            "insert-fragment"
-        ))
+            editorState = this.insertBlockIntoState(this.createNewEmptyBlock("unstyled"), "last", false);
+        editorState = this.insertBlockIntoState(this.createNewEmptyBlock("code-block"), "last", false);
+        this.onChange(editorState)
     }
 
-    createNewEmptyBlock(currentContent: ContentState, insertBefore: boolean, updateEditorState: boolean = true): ContentBlock {
-        // If this is a code block, we should insert a new block immediately after
+    createNewEmptyBlock(blockType: DraftBlockType): ContentBlock {
         const newBlock = new ContentBlock({
             key: genKey(),
-            type: "unstyled",
+            type: blockType,
             text: "",
             characterList: List()
         });
 
-        const newBlockMap = currentContent.getBlockMap().set(newBlock.getKey(), newBlock)
-        const blockArray = newBlockMap.toArray();
-
-        // If we should insert the block before the current content, splice it into the 0th
-        // position in the block array.
-        if (insertBefore) {
-            const newBlockIndex = blockArray.findIndex((cb: ContentBlock, idx: number) => {
-                return cb.getKey() === newBlock.getKey();
-            });
-            blockArray.splice(newBlockIndex, 1);
-            blockArray.splice(0, 0, newBlock);
-        }
-
-        if (updateEditorState) {
-            const contentState = ContentState.createFromBlockArray(blockArray, undefined);
-            this.setState({
-                editorState: EditorState.push(this.state.editorState, contentState, "insert-fragment"),
-            });
-        }
         return newBlock;
+    }
+
+    insertBlockIntoState(block: ContentBlock, insertPosition: "first" | "last" | Number, updateState: boolean): EditorState {
+        const currentContent = this.state.editorState.getCurrentContent()
+        const newBlockMap = currentContent.getBlockMap().set(block.getKey(), block)
+        const blockArray = newBlockMap.toArray()
+        const newBlockIndex = -1
+
+        if (typeof insertPosition === "string") {
+            if (insertPosition === "first")
+                blockArray.unshift(block);
+            else
+                blockArray.push(block);
+        } else if (typeof insertPosition === "number") {
+            blockArray.splice(insertPosition, 0, block);
+        }
+
+        const contentState = ContentState.createFromBlockArray(blockArray);
+        const newState = EditorState.push(this.state.editorState, contentState, "insert-fragment");
+        if (updateState)
+            this.onChange(newState);
+        return newState;
     }
 
     selectNext(currentKey: string): boolean {
         this.editorReadOnly(false)
 
-        const currentContent = this.getSelectionContext().currentContent;
+        const currentContent = this.getSelectionContext().currentContent
         let nextBlock = getNextBlockFor(currentContent, currentKey)
+        let editorState = this.state.editorState;
+
         if (!nextBlock) {
             const currentBlockType = currentContent.getBlockForKey(currentKey).getType();
             if (currentBlockType !== "code-block")
                 return false;
-            nextBlock = this.createNewEmptyBlock(currentContent, false);
+            nextBlock = this.createNewEmptyBlock("unstyled");
+            editorState = this.insertBlockIntoState(nextBlock, "last", false);
         }
 
-        var nextSelection = SelectionState.createEmpty(nextBlock.getKey())
-        nextSelection
+        let nextSelection: SelectionState = (SelectionState.createEmpty(nextBlock.getKey())
             .set('anchorOffset', 0)
-            .set('focusOffset', 0)
+            .set('focusOffset', 0) as SelectionState)
 
-        var editorState = EditorState.forceSelection(this.state.editorState, nextSelection)
-        this.setState({ editorState })
+        editorState = EditorState.forceSelection(editorState, nextSelection)
+        this.onChange(editorState);
+
         if (nextBlock.getType() !== "code-block")
             this.focus()
 
@@ -313,18 +291,23 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
 
         const currentContent = this.getSelectionContext().currentContent;
         let nextBlock = getPrevBlockFor(currentContent, currentKey)
+        let editorState = this.state.editorState
+
         if (!nextBlock) {
             const currentBlockType = currentContent.getBlockForKey(currentKey).getType();
             if (currentBlockType !== "code-block")
                 return false;
-            nextBlock = this.createNewEmptyBlock(currentContent, true);
+            nextBlock = this.createNewEmptyBlock("unstyled");
+            editorState = this.insertBlockIntoState(nextBlock, "first", false);
         }
+
         let nextSelection: SelectionState = (SelectionState.createEmpty(nextBlock.getKey())
             .set('anchorOffset', nextBlock.getText().length)
             .set('focusOffset', nextBlock.getText().length) as SelectionState)
 
-        var editorState = EditorState.forceSelection(this.state.editorState, nextSelection)
-        this.setState({ editorState })
+        editorState = EditorState.forceSelection(editorState, nextSelection)
+        this.onChange(editorState)
+
         if (nextBlock.getType() !== "code-block")
             this.focus()
 
@@ -337,7 +320,7 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
      * @param {boolean} readOnly
      */
     editorReadOnly(readOnly: boolean) {
-        this.setState({ readOnly: readOnly })
+        this.setState({ readOnly })
     }
 
     updateTextContentOfBlock(blockKey: string, textContent: string) {
@@ -519,9 +502,7 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
             contentState: Draft.ContentState,
             workbookMetadata: any,
         }) => {
-            this.setState({
-                editorState: EditorState.createWithContent(value.contentState)
-            });
+            this.onChange(EditorState.createWithContent(value.contentState));
             return value.workbookMetadata;
         });
     }
