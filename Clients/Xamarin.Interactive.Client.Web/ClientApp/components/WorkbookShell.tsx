@@ -9,6 +9,7 @@ import * as React from 'react'
 import * as matter from 'gray-matter'
 import * as uuidv4 from 'uuid/v4'
 import { saveAs } from 'file-saver'
+import { loadTheme } from 'office-ui-fabric-react/lib/Styling';
 
 import { osMac } from '../utils'
 import { WorkbookSession, ClientSessionEvent, ClientSessionEventKind } from '../WorkbookSession'
@@ -91,6 +92,8 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
             this.commandBar.setWorkbookTargets(this.shellContext.session.availableWorkbookTargets)
 
         document.addEventListener('keydown', this.onDocumentKeyDown)
+
+        loadTheme({})
     }
 
     componentWillUnmount() {
@@ -260,10 +263,12 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
                     notifyDismiss={() => this.hidePackageDialog()}
                     getIsHidden={() => this.state.isPackageDialogHidden}
                 />
-                <WorkbookEditor
-                    shellContext={this.shellContext}
-                    ref={(editor) => this.workbookEditor = editor }
-                    content=''/>
+                <div className="WorkbookShell-content-container">
+                    <WorkbookEditor
+                        shellContext={this.shellContext}
+                        ref={(editor) => this.workbookEditor = editor }
+                        content='' />
+                </div>
                 <div style={{ display: "none" }}>
                     <input
                         type="file"

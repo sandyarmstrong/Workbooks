@@ -10,12 +10,21 @@
   display: flex;
   flex-flow: column;
 
+  $commandBarHeight: 40px;
+
   .ms-CommandBar {
-    flex: 0 1 auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: $commandBarHeight;
+    z-index: 60000;
+
+    border-bottom: 1px solid #ccc;
   }
 
-  .WorkbookEditor-container {
+  .WorkbookShell-content-container {
     flex: 1 1 auto;
-    margin: 1em;
+    padding-top: $commandBarHeight;
   }
 }
