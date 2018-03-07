@@ -713,6 +713,9 @@
       <Component Id="AndroidAgentApp.Xamarin.Android.Support.v_.Palette.dll" Guid="1268FB88-26C6-4A29-82C0-1874B9B371C2">
         <File Id="AndroidAgentApp.Xamarin.Android.Support.v_.Palette.dll" Source="$(var.AndroidAppAssembliesDir)\Xamarin.Android.Support.v7.Palette.dll" />
       </Component>
+      <Component Id="AndroidAgentApp.System.Reflection.Primitives.dll" Guid="EE6AC9CC-9321-450D-89EA-33B1EE5F3A7D">
+        <File Id="AndroidAgentApp.System.Reflection.Primitives.dll" Source="$(var.AndroidAppAssembliesDir)\System.Reflection.Primitives.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="AndroidAgentAppClientIntegrationComponents" Directory="AndroidAgentAppClientIntegrationInstallFolder">
       <Component Id="Filedf726d8904b8bd646182c5041501fc57a86eb6a4" Guid="CA9D4CC8-8400-4DC7-B9FF-4FEAABA3802A">
