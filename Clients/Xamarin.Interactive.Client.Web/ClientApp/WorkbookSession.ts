@@ -139,8 +139,12 @@ export class WorkbookSession {
         return this.hubConnection.invoke('UpdateCodeCell', codeCellId, buffer)
     }
 
-    evaluate(codeCellId: string, evaluateAll: boolean = false): Promise<EvaluationResult> {
-        return this.hubConnection.invoke('Evaluate', codeCellId, evaluateAll)
+    evaluate(codeCellId: string): Promise<EvaluationResult> {
+        return this.hubConnection.invoke('Evaluate', codeCellId, false)
+    }
+
+    evaluateAll(): Promise<EvaluationResult> {
+        return this.hubConnection.invoke('Evaluate', null, true)
     }
 
     provideCompletions(codeCellId: string, lineNumber: number, column: number): Promise<monaco.languages.CompletionItem[]> {

@@ -12,6 +12,13 @@ import { IContextualMenuItem } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { WorkbookTarget, DotNetSdk, WorkbookSession, ClientSessionEvent, ClientSessionEventKind } from '../WorkbookSession'
 import { WorkbookShellContext } from './WorkbookShell';
 
+const evaluateWorkbookItem: IContextualMenuItem = {
+    key: 'evaluateWorkbook',
+    name: 'Run All',
+    icon: 'Play',
+    onClick: () => { }
+}
+
 const addPackagesItem: IContextualMenuItem = {
     key: 'addPackage',
     name: 'NuGet',
@@ -50,6 +57,7 @@ const farItems: IContextualMenuItem[] = [
 ]
 
 interface WorkbookCommandBarProps {
+    evaluateWorkbook: () => void
     addPackages: () => void
     loadWorkbook: () => void
     saveWorkbook: () => void
@@ -70,11 +78,13 @@ export class WorkbookCommandBar extends React.Component<WorkbookCommandBarProps,
 
         this.state = {
             items: [
+                evaluateWorkbookItem,
                 addPackagesItem
             ],
             overflowItems
         }
 
+        evaluateWorkbookItem.onClick = props.evaluateWorkbook
         addPackagesItem.onClick = props.addPackages
         saveWorkbookItem.onClick = props.saveWorkbook
         openWorkbookItem.onClick = props.loadWorkbook
@@ -118,6 +128,7 @@ export class WorkbookCommandBar extends React.Component<WorkbookCommandBarProps,
                         items: targetItems
                     }
                 },
+                evaluateWorkbookItem,
                 addPackagesItem
             ]
         })

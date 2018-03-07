@@ -50,6 +50,7 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
         this.onStatusUIAction = this.onStatusUIAction.bind(this),
         this.onClientSessionEvent = this.onClientSessionEvent.bind(this)
 
+        this.evaluateWorkbook = this.evaluateWorkbook.bind(this)
         this.showPackageDialog = this.showPackageDialog.bind(this)
         this.triggerFilePicker = this.triggerFilePicker.bind(this)
         this.saveWorkbook = this.saveWorkbook.bind(this)
@@ -126,6 +127,10 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
                     this.saveWorkbook()
                 break
         }
+    }
+
+    evaluateWorkbook() {
+        this.shellContext.session.evaluateAll()
     }
 
     showPackageDialog() {
@@ -248,6 +253,7 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
             <div className='WorkbookShell-container'>
                 <WorkbookCommandBar
                     ref={component => this.commandBar = component}
+                    evaluateWorkbook={this.evaluateWorkbook}
                     addPackages={this.showPackageDialog}
                     loadWorkbook={this.triggerFilePicker}
                     saveWorkbook={this.saveWorkbook}
