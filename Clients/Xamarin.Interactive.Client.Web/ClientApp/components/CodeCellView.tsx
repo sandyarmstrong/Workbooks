@@ -136,10 +136,6 @@ export abstract class CodeCellView<
                 <div className="CodeCell-diagnostics-container">
                     <ul>
                         {this.state.diagnostics.map((diag, i) => {
-                            const startPosition = diag.span.span.start
-                            const spanText =
-                                "(" + (startPosition.line + 1) +
-                                "," + (startPosition.character + 1) + ")"
                             return (
                                 <li
                                     key={randomReactKey()}
@@ -150,12 +146,13 @@ export abstract class CodeCellView<
                                             target: this.getBlockKey(),
                                             type: EditorMessageType.setCursor,
                                             data: {
-                                                lineNumber: startPosition.line + 1,
-                                                column: startPosition.character + 1
+                                                lineNumber: diag.span.startLineNumber,
+                                                column: diag.span.startColumn
                                             }
                                         })
                                     }}>
-                                    ({spanText}): {diag.severity} {diag.id}: {diag.message}
+                                    ({diag.span.startLineNumber},{diag.span.startColumn}):&nbsp;
+                                        {diag.severity} {diag.id}: {diag.message}
                                 </li>
                             )
                         })}

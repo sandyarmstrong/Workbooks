@@ -161,19 +161,12 @@ export class MonacoCellEditor extends React.Component<MonacoCellEditorProps, Mon
             if (diagnostic.severity !== DiagnosticSeverity.Error)
                 continue
 
-            const span = diagnostic.span.span
-
             this.markText({
                 options: {
                     inlineClassName: 'xi-diagnostic',
                     hoverMessage: diagnostic.message
                 },
-                range: {
-                    startLineNumber: span.start.line + 1,
-                    startColumn: span.start.character + 1,
-                    endLineNumber: span.end.line + 1,
-                    endColumn: span.end.character + 1
-                }
+                range: diagnostic.span
             })
         }
     }

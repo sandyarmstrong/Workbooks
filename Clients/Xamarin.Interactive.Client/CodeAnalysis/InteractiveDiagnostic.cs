@@ -9,16 +9,16 @@ using Microsoft.CodeAnalysis;
 
 namespace Xamarin.Interactive.CodeAnalysis
 {
-    struct InteractiveDiagnostic
+    public struct InteractiveDiagnostic
     {
-        public FileLinePositionSpan Span { get; }
+        public PositionSpan Span { get; }
         public DiagnosticSeverity Severity { get; }
         public string Message { get; }
         public string Id { get; }
 
         public InteractiveDiagnostic (DiagnosticSeverity severity, string message)
         {
-            Span = default (FileLinePositionSpan);
+            Span = default;
             Severity = severity;
             Message = message;
             Id = null;
@@ -26,10 +26,7 @@ namespace Xamarin.Interactive.CodeAnalysis
 
         public InteractiveDiagnostic (Diagnostic diagnostic)
         {
-            Span = diagnostic.Location.GetMappedLineSpan ();
-            if (!Span.IsValid)
-                Span = diagnostic.Location.GetLineSpan ();
-
+            Span = PositionSpan.FromRoslyn (diagnostic.Location);
             Severity = diagnostic.Severity;
             Message = diagnostic.GetMessage ();
             Id = diagnostic.Id;

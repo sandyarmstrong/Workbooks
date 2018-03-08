@@ -5,6 +5,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+export interface PositionSpan {
+    startLineNumber: number
+    startColumn: number
+    endLineNumber: number
+    endColumn: number
+    filePath?: string
+}
+
 export const enum DiagnosticSeverity {
     Hidden = 'Hidden',
     Info = 'Info',
@@ -12,27 +20,11 @@ export const enum DiagnosticSeverity {
     Error = 'Error'
 }
 
-export interface LinePosition {
-    line: number
-    character: number
-}
-
-export interface LinePositionSpan {
-    start: LinePosition
-    end: LinePosition
-}
-
-export interface FileLinePositionSpan {
-    path: string
-    hasMappedPath: boolean
-    span: LinePositionSpan
-}
-
 export interface Diagnostic {
     id: string
     message: string
     severity: DiagnosticSeverity
-    span: FileLinePositionSpan
+    span: PositionSpan
 }
 
 // Events
