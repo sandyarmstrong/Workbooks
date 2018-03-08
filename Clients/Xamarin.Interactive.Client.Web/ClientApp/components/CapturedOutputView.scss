@@ -7,7 +7,7 @@
   @include maxCodeLineCount(10);
 
   white-space: pre;
-  overflow: scroll;
+  overflow: auto;
 
   .stderr {
     color: $fgColorError;
