@@ -5,6 +5,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Newtonsoft.Json;
+
 using Xamarin.Interactive.CodeAnalysis.Completion;
 
 namespace Xamarin.Interactive.Client.Monaco
@@ -13,8 +15,10 @@ namespace Xamarin.Interactive.Client.Monaco
     {
         public string Label { get; }
 
+        [JsonProperty (NullValueHandling = NullValueHandling.Ignore)]
         public string InsertText { get; }
 
+        [JsonProperty (NullValueHandling = NullValueHandling.Ignore)]
         public string Detail { get; }
 
         // Corresponds to Monaco's CompletionItemKind enum

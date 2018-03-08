@@ -28,20 +28,10 @@ export class WorkbookCompletionItemProvider implements monaco.languages.Completi
         if (codeCellId == null)
             return items
 
-        items = await this.shellContext.session.provideCompletions(
+        return await this.shellContext.session.provideCompletions(
             codeCellId,
             position.lineNumber,
             position.column)
-
-        // TODO: See if we can fix this on the server side. See comments on MonacoCompletionItem
-        for (let item of items) {
-            if (item.insertText == null)
-                item.insertText = undefined
-            if (item.detail == null)
-                item.detail = undefined
-        }
-
-        return items
     }
 }
 
