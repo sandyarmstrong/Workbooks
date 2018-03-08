@@ -567,7 +567,6 @@ namespace Xamarin.Interactive.Workbook.Models
 
             try {
                 if (compilation != null) {
-                    codeCellState.LastEvaluationRequestId = compilation.MessageId;
                     codeCellState.IsResultAnExpression = compilation.IsResultAnExpression;
 
                     await ClientSession.Agent.Api.EvaluateAsync (

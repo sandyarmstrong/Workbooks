@@ -81,7 +81,7 @@ namespace Xamarin.Interactive.Compilation
             Version formsVersion,
             ClientSession clientSession,
             DependencyResolver dependencyResolver,
-            int evaluationContextId,
+            EvaluationContextId evaluationContextId,
             bool includePeImage)
         {
             var formsAssembly = InteractiveInstallation.Default.LocateFormsAssembly (
