@@ -76,7 +76,7 @@ namespace Xamarin.Interactive.CodeAnalysis
 
         readonly Inhibitor evaluationInhibitor = new Inhibitor ();
 
-        readonly ILanguageService workspace;
+        readonly IWorkspaceService workspace;
         readonly EvaluationEnvironment evaluationEnvironment;
         readonly IAgentConnection agentConnection;
 
@@ -93,7 +93,7 @@ namespace Xamarin.Interactive.CodeAnalysis
         public bool CanEvaluate => !evaluationInhibitor.IsInhibited;
 
         public EvaluationService (
-            ILanguageService workspace,
+            IWorkspaceService workspace,
             EvaluationEnvironment evaluationEnvironment,
             IAgentConnection agentConnection)
         {
