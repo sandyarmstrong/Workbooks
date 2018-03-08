@@ -60,6 +60,8 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
     constructor(props: WorkbooksEditorProps) {
         super(props);
 
+        this.onClientSessionEvent = this.onClientSessionEvent.bind(this)
+
         this.subscriptors = []
 
         const editorState = EditorState.createEmpty()
@@ -77,10 +79,12 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
             monaco.languages.registerCompletionItemProvider(
                 "csharp",
                 new WorkbookCompletionItemProvider(this.props.shellContext, this)))
+
         this.monacoProviderTickets.push(
             monaco.languages.registerHoverProvider(
                 "csharp",
                 new WorkbookHoverProvider(this.props.shellContext, this)))
+
         this.monacoProviderTickets.push(
             monaco.languages.registerSignatureHelpProvider(
                 "csharp",
@@ -93,7 +97,7 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
     }
 
     componentDidMount() {
-        this.props.shellContext.session.clientSessionEvent.addListener(this.onClientSessionEvent.bind(this));
+        this.props.shellContext.session.clientSessionEvent.addListener(this.onClientSessionEvent);
         this.focus()
     }
 
