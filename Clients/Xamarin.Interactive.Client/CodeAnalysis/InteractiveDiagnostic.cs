@@ -24,15 +24,16 @@ namespace Xamarin.Interactive.CodeAnalysis
             Id = null;
         }
 
-        public InteractiveDiagnostic (Diagnostic diagnostic)
+        public InteractiveDiagnostic (
+            PositionSpan span,
+            DiagnosticSeverity severity,
+            string message,
+            string id)
         {
-            Span = PositionSpan.FromRoslyn (diagnostic.Location);
-            Severity = diagnostic.Severity;
-            Message = diagnostic.GetMessage ();
-            Id = diagnostic.Id;
+            Span = span;
+            Severity = severity;
+            Message = message;
+            Id = id;
         }
-
-        public static explicit operator InteractiveDiagnostic (Diagnostic diagnostic) =>
-            new InteractiveDiagnostic (diagnostic);
     }
 }

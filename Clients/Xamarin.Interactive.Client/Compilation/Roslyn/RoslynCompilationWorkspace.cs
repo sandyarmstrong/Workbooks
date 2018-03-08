@@ -28,7 +28,7 @@ namespace Xamarin.Interactive.Compilation.Roslyn
     using Microsoft.CodeAnalysis.Options;
     using Microsoft.CodeAnalysis.Text;
 
-    sealed class RoslynCompilationWorkspace : IDisposable
+    sealed class RoslynCompilationWorkspace : CodeAnalysis.IWorkspaceService, IDisposable
     {
         static class HostServicesFactory
         {
@@ -412,9 +412,6 @@ namespace Xamarin.Interactive.Compilation.Roslyn
 
         public ImmutableArray<WebDependency> WebDependencies => metadataReferenceResolver.WebDependencies;
 
-        public ImmutableArray<Diagnostic> CurrentSubmissionDiagnostics { get; private set; }
-            = ImmutableArray<Diagnostic>.Empty;
-
         #region Submission Management
 
         public DocumentId GetSubmissionDocumentId (SourceTextContainer buffer) =>
@@ -499,14 +496,6 @@ namespace Xamarin.Interactive.Compilation.Roslyn
             workspace.CloseDocument (documentId);
             workspace.RemoveProject (project.Id);
         }
-
-        public IEnumerable<DocumentId> GetTopologicallySortedSubmissionIds ()
-            => workspace
-                .CurrentSolution
-                .GetProjectDependencyGraph ()
-                .GetTopologicallySortedProjects ()
-                .Select (workspace.CurrentSolution.GetProject)
-                .SelectMany (p => p.DocumentIds);
 
         const string assemblyNamePrefix = "🐵🐻";
         static readonly byte [] assemblyNamePrefixBytes = Encoding.UTF8.GetBytes (assemblyNamePrefix);
@@ -649,10 +638,11 @@ namespace Xamarin.Interactive.Compilation.Roslyn
             return Task.FromResult (compilationUnit);
         }
 
-        public async Task<CodeAnalysis.Compilation> GetSubmissionCompilationAsync (
-            DocumentId submissionDocumentId,
-            EvaluationEnvironment evaluationEnvironment,
-            CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<(CodeAnalysis.Compilation compilation, ImmutableList<InteractiveDiagnostic> diagnostics)>
+            GetSubmissionCompilationAsync (
+                DocumentId submissionDocumentId,
+                IEvaluationEnvironment evaluationEnvironment,
+                CancellationToken cancellationToken = default)
         {
             if (submissionDocumentId == null)
                 throw new ArgumentNullException (nameof (submissionDocumentId));
@@ -695,8 +685,6 @@ namespace Xamarin.Interactive.Compilation.Roslyn
                     peImage = stream.ToArray ();
                 }
 
-                CurrentSubmissionDiagnostics = emitResult.Diagnostics;
-
                 AssemblyDefinition executableAssembly = null;
                 if (peImage != null) {
                     var entryPoint = compilation.GetEntryPoint (cancellationToken);
@@ -713,8 +701,8 @@ namespace Xamarin.Interactive.Compilation.Roslyn
                         peImage);
                 }
 
-                return new CodeAnalysis.Compilation (
-                    submissionDocumentId.ToCodeCellId (),
+                return (new CodeAnalysis.Compilation (
+                    ToCodeCellId (submissionDocumentId),
                     submissionCount,
                     EvaluationContextId,
                     evaluationEnvironment,
@@ -728,7 +716,12 @@ namespace Xamarin.Interactive.Compilation.Roslyn
                     await DependencyResolver.ResolveReferencesAsync (
                         compilation.References,
                         includePeImagesInResolution,
-                        cancellationToken).ConfigureAwait (false));
+                        cancellationToken).ConfigureAwait (false)),
+                        emitResult
+                            .Diagnostics
+                            .Filter ()
+                            .Select (ToInteractiveDiagnostic)
+                            .ToImmutableList ());
             }
         }
 
@@ -751,5 +744,79 @@ namespace Xamarin.Interactive.Compilation.Roslyn
         }
 
         #endregion
+
+        #region IEvaluationService
+
+        public ImmutableList<CodeCellId> GetTopologicallySortedCellIds ()
+            => workspace
+                .CurrentSolution
+                .GetProjectDependencyGraph ()
+                .GetTopologicallySortedProjects ()
+                .Select (workspace.CurrentSolution.GetProject)
+                .SelectMany (p => p.DocumentIds)
+                .Select (ToCodeCellId)
+                .ToImmutableList ();
+
+        public CodeCellId InsertCell (
+            CodeCellBuffer buffer,
+            CodeCellId previousCellId,
+            CodeCellId nextCellId)
+            => ToCodeCellId (AddSubmission (
+                buffer.CurrentText,
+                ToDocumentId (previousCellId),
+                ToDocumentId (nextCellId)));
+
+        public void RemoveCell (CodeCellId cellId, CodeCellId nextCellId)
+            => RemoveSubmission (
+                ToDocumentId (cellId),
+                ToDocumentId (nextCellId));
+
+        public bool IsCellComplete (CodeCellId cellId)
+            => IsDocumentSubmissionComplete (ToDocumentId (cellId));
+
+        public bool ShouldInvalidateCellBuffer (CodeCellId cellId)
+            => HaveAnyLoadDirectiveFilesChanged (ToDocumentId (cellId));
+
+        public async Task<ImmutableList<InteractiveDiagnostic>> GetCellDiagnosticsAsync (
+            CodeCellId cellId,
+            CancellationToken cancellationToken = default)
+            => (await GetSubmissionCompilationDiagnosticsAsync (
+                ToDocumentId (cellId),
+                cancellationToken))
+                .Filter ()
+                .Select (ToInteractiveDiagnostic)
+                .ToImmutableList ();
+
+        public Task<(CodeAnalysis.Compilation compilation, ImmutableList<InteractiveDiagnostic> diagnostics)>
+            GetCellCompilationAsync (
+                CodeCellId cellId,
+                IEvaluationEnvironment evaluationEnvironment,
+                CancellationToken cancellationToken = default)
+                => GetSubmissionCompilationAsync (
+                    ToDocumentId (cellId),
+                    evaluationEnvironment,
+                    cancellationToken);
+
+        #endregion
+
+        internal static CodeCellId ToCodeCellId (DocumentId documentId)
+            => new CodeCellId (documentId.ProjectId.Id, documentId.Id);
+
+        internal static DocumentId ToDocumentId (CodeCellId codeCellId)
+        {
+            if (codeCellId == default)
+                return default;
+
+            return DocumentId.CreateFromSerialized (
+                ProjectId.CreateFromSerialized (codeCellId.ProjectId),
+                codeCellId.Id);
+        }
+
+        static InteractiveDiagnostic ToInteractiveDiagnostic (Diagnostic diagnostic)
+            => new InteractiveDiagnostic (
+                PositionSpan.FromRoslyn (diagnostic.Location),
+                diagnostic.Severity,
+                diagnostic.GetMessage (),
+                diagnostic.Id);
     }
 }

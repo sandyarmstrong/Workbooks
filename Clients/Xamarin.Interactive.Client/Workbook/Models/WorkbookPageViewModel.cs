@@ -533,11 +533,12 @@ namespace Xamarin.Interactive.Workbook.Models
             }
 
             CodeAnalysis.Compilation compilation = null;
+            ImmutableList<InteractiveDiagnostic> diagnostics = null;
             ExceptionNode exception = null;
             bool agentTerminatedWhileEvaluating = false;
 
             try {
-                compilation = await ClientSession.CompilationWorkspace.GetSubmissionCompilationAsync (
+                (compilation, diagnostics) = await ClientSession.CompilationWorkspace.GetSubmissionCompilationAsync (
                     codeCellState.DocumentId,
                     new EvaluationEnvironment (ClientSession.WorkingDirectory),
                     cancellationToken);
@@ -559,11 +560,11 @@ namespace Xamarin.Interactive.Workbook.Models
                 exception = ExceptionNode.Create (e);
             }
 
-            var diagnostics = ClientSession.CompilationWorkspace.CurrentSubmissionDiagnostics.Filter ();
-            codeCellState.View.HasErrorDiagnostics = diagnostics.HasErrors;
+            var hasErrorDiagnostics = codeCellState.View.HasErrorDiagnostics = diagnostics
+                .Any (d => d.Severity == DiagnosticSeverity.Error);
 
             foreach (var diagnostic in diagnostics)
-                codeCellState.View.RenderDiagnostic ((InteractiveDiagnostic)diagnostic);
+                codeCellState.View.RenderDiagnostic (diagnostic);
 
             try {
                 if (compilation != null) {
@@ -596,7 +597,7 @@ namespace Xamarin.Interactive.Workbook.Models
                     EvaluationService.FilterException (exception),
                     EvaluationResultHandling.Replace);
                 evaluationStatus = CodeCellEvaluationStatus.EvaluationException;
-            } else if (diagnostics.HasErrors) {
+            } else if (hasErrorDiagnostics) {
                 return CodeCellEvaluationStatus.ErrorDiagnostic;
             } else if (agentTerminatedWhileEvaluating) {
                 evaluationStatus = CodeCellEvaluationStatus.Disconnected;
@@ -617,7 +618,7 @@ namespace Xamarin.Interactive.Workbook.Models
 
         CodeCellState GetCodeCellStateById (CodeCellId codeCellId)
         {
-            var documentId = codeCellId.ToDocumentId ();
+            var documentId = RoslynCompilationWorkspace.ToDocumentId (codeCellId);
             return CodeCells.Values.FirstOrDefault (
                 codeCell => codeCell.DocumentId == documentId);
         }

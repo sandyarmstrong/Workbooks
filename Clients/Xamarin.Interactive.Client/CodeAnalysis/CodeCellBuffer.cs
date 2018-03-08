@@ -14,7 +14,7 @@ using Xamarin.Interactive.Workbook.Models;
 
 namespace Xamarin.Interactive.CodeAnalysis
 {
-    sealed class CodeCellBuffer : SourceTextContainer, ICellBuffer
+    public sealed class CodeCellBuffer : SourceTextContainer, ICellBuffer
     {
         sealed class CodeCellBufferSourceText : SourceText
         {
