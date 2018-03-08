@@ -12,6 +12,12 @@ using System.Threading.Tasks;
 
 namespace Xamarin.Interactive.CodeAnalysis
 {
+    /// <summary>
+    /// Do not implement! This is just a temporary measure to allow
+    /// WorkbookPageViewModel to coexist with EvaluationService and
+    /// plumb through ClientSession.
+    /// This goes away when WorkbookPageViewModel goes away.
+    /// </summary>
     interface IEvaluationService : IDisposable
     {
         bool CanEvaluate { get; }

@@ -280,41 +280,6 @@ namespace Xamarin.Interactive.CodeAnalysis
             return Task.CompletedTask;
         }
 
-        public async Task EvaluateAsync (
-            CodeCellId targetCodeCellId = default,
-            bool evaluateAll = false,
-            CancellationToken cancellationToken = default)
-        {
-            var evaluationModel = await GetEvaluationModelAsync (
-                targetCodeCellId,
-                evaluateAll,
-                cancellationToken);
-
-            if (evaluationModel.ShouldResetAgentState)
-                await agentConnection.Api.ResetStateAsync ();
-
-            foreach (var evaluatableCodeCell in evaluationModel.CellsToEvaluate) {
-                events.Observers.OnNext (
-                    new CodeCellEvaluationStartedEvent (
-                        evaluatableCodeCell.CodeCellId));
-
-                var status = await CoreEvaluateCodeCellAsync (evaluatableCodeCell);
-
-                events.Observers.OnNext (new CodeCellEvaluationFinishedEvent (
-                    evaluatableCodeCell.CodeCellId,
-                    status,
-                    evaluationModel.ShouldMaybeStartNewCodeCell &&
-                        evaluatableCodeCell.CodeCellId == targetCodeCellId,
-                    evaluatableCodeCell.Diagnostics));
-
-                switch (status) {
-                case CodeCellEvaluationStatus.ErrorDiagnostic:
-                case CodeCellEvaluationStatus.Disconnected:
-                    return;
-                }
-            }
-        }
-
         async Task<EvaluationModel> GetEvaluationModelAsync (
             CodeCellId targetCodeCellId = default,
             bool evaluateAll = false,
@@ -385,6 +350,41 @@ namespace Xamarin.Interactive.CodeAnalysis
             model.ShouldMaybeStartNewCodeCell = targetCellIndex == cells.Count - 1;
 
             return model;
+        }
+
+        public async Task EvaluateAsync (
+            CodeCellId targetCodeCellId = default,
+            bool evaluateAll = false,
+            CancellationToken cancellationToken = default)
+        {
+            var evaluationModel = await GetEvaluationModelAsync (
+                targetCodeCellId,
+                evaluateAll,
+                cancellationToken);
+
+            if (evaluationModel.ShouldResetAgentState)
+                await agentConnection.Api.ResetStateAsync ();
+
+            foreach (var evaluatableCodeCell in evaluationModel.CellsToEvaluate) {
+                events.Observers.OnNext (
+                    new CodeCellEvaluationStartedEvent (
+                        evaluatableCodeCell.CodeCellId));
+
+                var status = await CoreEvaluateCodeCellAsync (evaluatableCodeCell);
+
+                events.Observers.OnNext (new CodeCellEvaluationFinishedEvent (
+                    evaluatableCodeCell.CodeCellId,
+                    status,
+                    evaluationModel.ShouldMaybeStartNewCodeCell &&
+                    evaluatableCodeCell.CodeCellId == targetCodeCellId,
+                    evaluatableCodeCell.Diagnostics));
+
+                switch (status) {
+                case CodeCellEvaluationStatus.ErrorDiagnostic:
+                case CodeCellEvaluationStatus.Disconnected:
+                    return;
+                }
+            }
         }
 
         async Task<CodeCellEvaluationStatus> CoreEvaluateCodeCellAsync (
