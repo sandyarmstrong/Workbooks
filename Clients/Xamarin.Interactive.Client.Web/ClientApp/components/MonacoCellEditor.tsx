@@ -12,7 +12,7 @@ import * as ReactDOM from 'react-dom'
 import { osMac } from '../utils'
 import { SelectionState } from 'draft-js'
 import { EditorMessage, EditorMessageType, EditorKeys } from '../utils/EditorMessages'
-import { CodeCellUpdateResponse } from '../WorkbookSession'
+import { CodeCellUpdate, DiagnosticSeverity } from '../evaluation'
 
 import './MonacoCellEditor.scss'
 
@@ -26,7 +26,7 @@ export interface MonacoCellEditorProps {
         updateTextContentOfBlock: (blockKey: string, textContent: string) => void,
         setSelection: (anchorKey: string, offset: number) => void,
         setModelId: (modelId: string) => void,
-        updateCodeCell(buffer: string): Promise<CodeCellUpdateResponse>,
+        updateCodeCell(buffer: string): Promise<CodeCellUpdate | null>,
         evaluate: () => void
     }
     block: {
@@ -46,7 +46,7 @@ enum ViewEventType {
 export class MonacoCellEditor extends React.Component<MonacoCellEditorProps, MonacoCellEditorState> {
     private windowResizeHandler: any;
     private editor?: monaco.editor.ICodeEditor;
-    private lastUpdateResponse?: CodeCellUpdateResponse
+    private lastUpdateResponse: CodeCellUpdate | null = null
     private markedTextIds: string[] = []
 
     constructor(props: MonacoCellEditorProps) {
@@ -153,13 +153,32 @@ export class MonacoCellEditor extends React.Component<MonacoCellEditorProps, Mon
     async updateCodeCellStatus(buffer: string) {
         this.lastUpdateResponse = await this.props.blockProps.updateCodeCell(buffer)
         this.clearMarkedText()
+
         if (!this.lastUpdateResponse)
             return
-        for (let decoration of this.lastUpdateResponse.diagnostics)
-            this.markText(decoration)
+
+        for (const diagnostic of this.lastUpdateResponse.diagnostics) {
+            if (diagnostic.severity !== DiagnosticSeverity.Error)
+                continue
+
+            const span = diagnostic.span.span
+
+            this.markText({
+                options: {
+                    inlineClassName: 'xi-diagnostic',
+                    hoverMessage: diagnostic.message
+                },
+                range: {
+                    startLineNumber: span.start.line + 1,
+                    startColumn: span.start.character + 1,
+                    endLineNumber: span.end.line + 1,
+                    endColumn: span.end.character + 1
+                }
+            })
+        }
     }
 
-    markText(decoration: monaco.editor.IModelDecoration) {
+    markText(decoration: monaco.editor.IModelDeltaDecoration) {
         let newIds = this.editor!.getModel().deltaDecorations([], [decoration])
         this.markedTextIds.push(...newIds)
     }

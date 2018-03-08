@@ -1,5 +1,3 @@
-import { CodeCellView } from "./components/CodeCellView";
-
 //
 // Author:
 //   Aaron Bockover <abock@microsoft.com>
@@ -37,24 +35,11 @@ export interface Diagnostic {
     span: FileLinePositionSpan
 }
 
-export interface CodeCellState {
-    id: string
-    agentTerminatedWhileEvaluating: boolean
-    evaluationCount: number
-    isResultAnExpression: boolean
-    diagnostics: Diagnostic[]
-}
-
-export interface EvaluationResult {
-    success: boolean
-    shouldStartNewCell: boolean
-    codeCellStates: CodeCellState[]
-}
-
 // Events
 
 export const enum CodeCellEventType {
     EvaluationStarted = 'CodeCellEvaluationStartedEvent',
+    EvaluationFinished = 'CodeCellEvaluationFinishedEvent',
     Result = 'CodeCellResultEvent',
     CapturedOutputSegment = 'CapturedOutputSegment'
 }
@@ -69,15 +54,32 @@ export const enum CodeCellResultHandling {
     Append = 'Append'
 }
 
+export const enum CodeCellEvaluationStatus {
+    Success = 'Success',
+    Disconnected = 'Disconnected',
+    Interrupted = 'Interrupted',
+    ErrorDiagnostic = 'ErrorDiagnostic',
+    EvaluationException = 'EvaluationException'
+}
+
+export interface CodeCellEvaluationFinished extends ICodeCellEvent {
+    status: CodeCellEvaluationStatus
+    shouldStartNewCell: boolean
+    diagnostics: Diagnostic[]
+}
+
+export interface CodeCellUpdate extends ICodeCellEvent {
+    isSubmissionComplete: boolean
+    diagnostics: Diagnostic[]
+}
+
 export interface CodeCellResult extends ICodeCellEvent  {
-    codeCellId: string
     resultHandling: CodeCellResultHandling
     type: string | null
     valueRepresentations: any[] | null
 }
 
 export interface CapturedOutputSegment extends ICodeCellEvent {
-    codeCellId: string
     fileDescriptor: number
     value: string
 }

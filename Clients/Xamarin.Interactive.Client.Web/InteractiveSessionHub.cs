@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.SignalR;
 
-using Microsoft.CodeAnalysis;
-
 using NuGet.Packaging.Core;
 using NuGet.Versioning;
 
@@ -21,6 +19,7 @@ using Xamarin.Interactive.Client.Monaco;
 using Xamarin.Interactive.Client.Web.Hosting;
 using Xamarin.Interactive.CodeAnalysis;
 using Xamarin.Interactive.CodeAnalysis.Completion;
+using Xamarin.Interactive.CodeAnalysis.Events;
 using Xamarin.Interactive.CodeAnalysis.Hover;
 using Xamarin.Interactive.CodeAnalysis.SignatureHelp;
 using Xamarin.Interactive.NuGet;
@@ -81,72 +80,35 @@ namespace Xamarin.Interactive.Client.Web
                 .BindClientSession (connectionId, session);
         }
 
-        public async Task<string> InsertCodeCell (
+        EvaluationService GetEvaluationService ()
+            => serviceProvider
+                .GetInteractiveSessionHubManager ()
+                .GetSession (Context.ConnectionId)
+                .EvaluationService;
+
+        public Task<CodeCellId> InsertCodeCell (
             string initialBuffer,
             string relativeToCodeCellId,
             bool insertBefore)
-        {
-            var sessionState = serviceProvider
-                .GetInteractiveSessionHubManager ()
-                .GetSession (Context.ConnectionId);
+            => GetEvaluationService ().InsertCodeCellAsync (
+                initialBuffer,
+                relativeToCodeCellId,
+                insertBefore,
+                Context.Connection.ConnectionAbortedToken);
 
-            var codeCellState = await sessionState
-                .EvaluationService
-                .InsertCodeCellAsync (
-                    initialBuffer,
-                    relativeToCodeCellId,
-                    insertBefore,
-                    Context.Connection.ConnectionAbortedToken);
-
-            return codeCellState.Id;
-        }
-
-        public async Task<CodeCellStatus> UpdateCodeCell (
+        public Task<CodeCellUpdatedEvent> UpdateCodeCell (
             string codeCellId,
             string updatedBuffer)
-        {
-            var sessionState = serviceProvider
-                .GetInteractiveSessionHubManager ()
-                .GetSession (Context.ConnectionId);
+            => GetEvaluationService ().UpdateCodeCellAsync (
+                codeCellId,
+                updatedBuffer,
+                Context.Connection.ConnectionAbortedToken);
 
-            var cellState = await sessionState
-                .EvaluationService
-                .UpdateCodeCellAsync (
-                    codeCellId,
-                    updatedBuffer,
-                    Context.Connection.ConnectionAbortedToken);
-
-            var workspace = sessionState
-                    .ClientSession
-                    .CompilationWorkspace;
-            var documentId = cellState.Id.ToDocumentId ();
-
-            var diagnostics = await workspace.GetSubmissionCompilationDiagnosticsAsync (
-                documentId, Context.Connection.ConnectionAbortedToken);
-
-            return new CodeCellStatus {
-                IsSubmissionComplete = sessionState
-                    .ClientSession
-                    .CompilationWorkspace
-                    .IsDocumentSubmissionComplete (documentId),
-                Diagnostics = diagnostics
-                    .Where (d => d.Severity == DiagnosticSeverity.Error)
-                    .Select (d => new MonacoModelDeltaDecoration (d))
-                    .ToArray ()
-            };
-        }
-
-        public Task<EvaluationResult> Evaluate (string targetCodeCellId, bool evaluateAll)
-        {
-            var sessionState = serviceProvider
-                .GetInteractiveSessionHubManager ()
-                .GetSession (Context.ConnectionId);
-
-            return sessionState.EvaluationService.EvaluateAsync (
+        public Task Evaluate (string targetCodeCellId, bool evaluateAll)
+            => GetEvaluationService ().EvaluateAsync (
                 targetCodeCellId,
                 evaluateAll,
                 Context.Connection.ConnectionAbortedToken);
-        }
 
         // TODO: Probably want package source URL, too
         public async Task<List<string>> InstallPackage (string id, string version)
@@ -177,21 +139,21 @@ namespace Xamarin.Interactive.Client.Web
             int column)
         {
             var sessionState = serviceProvider
-                    .GetInteractiveSessionHubManager ()
-                    .GetSession (Context.ConnectionId);
+                .GetInteractiveSessionHubManager ()
+                .GetSession (Context.ConnectionId);
 
             if (sessionState.CompletionController == null)
                 sessionState.CompletionController = new CompletionController (
                     sessionState.ClientSession.CompilationWorkspace);
 
-            var codeCells = await sessionState.EvaluationService.GetAllCodeCellsAsync (
-                Context.Connection.ConnectionAbortedToken);
-            var targetCodeCellState = codeCells.FirstOrDefault (c => c.Id == targetCodeCellId);
-
-            var completionItems = await sessionState.CompletionController.ProvideFilteredCompletionItemsAsync (
-                targetCodeCellState.Buffer.CurrentText,
-                new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
-                Context.Connection.ConnectionAbortedToken);
+            var completionItems = await sessionState
+                .CompletionController
+                .ProvideFilteredCompletionItemsAsync (
+                    (await sessionState.EvaluationService.GetCodeCellBufferAsync (
+                        targetCodeCellId,
+                        Context.Connection.ConnectionAbortedToken)).CurrentText,
+                    new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
+                    Context.Connection.ConnectionAbortedToken);
 
             return completionItems
                 .Select (i => new MonacoCompletionItem (i))
@@ -204,21 +166,21 @@ namespace Xamarin.Interactive.Client.Web
             int column)
         {
             var sessionState = serviceProvider
-                    .GetInteractiveSessionHubManager ()
-                    .GetSession (Context.ConnectionId);
+                .GetInteractiveSessionHubManager ()
+                .GetSession (Context.ConnectionId);
 
             if (sessionState.HoverController == null)
                 sessionState.HoverController = new HoverController (
                     sessionState.ClientSession.CompilationWorkspace);
 
-            var codeCells = await sessionState.EvaluationService.GetAllCodeCellsAsync (
-                Context.Connection.ConnectionAbortedToken);
-            var targetCodeCellState = codeCells.FirstOrDefault (c => c.Id == targetCodeCellId);
-
-            var hover = await sessionState.HoverController.ProvideHoverAsync (
-                targetCodeCellState.Buffer.CurrentText,
-                new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
-                Context.Connection.ConnectionAbortedToken);
+            var hover = await sessionState
+                .HoverController
+                .ProvideHoverAsync (
+                    (await sessionState.EvaluationService.GetCodeCellBufferAsync (
+                        targetCodeCellId,
+                        Context.Connection.ConnectionAbortedToken)).CurrentText,
+                    new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
+                    Context.Connection.ConnectionAbortedToken);
 
             return new MonacoHover (hover);
         }
@@ -229,21 +191,21 @@ namespace Xamarin.Interactive.Client.Web
             int column)
         {
             var sessionState = serviceProvider
-                    .GetInteractiveSessionHubManager ()
-                    .GetSession (Context.ConnectionId);
+                .GetInteractiveSessionHubManager ()
+                .GetSession (Context.ConnectionId);
 
             if (sessionState.SignatureHelpController == null)
                 sessionState.SignatureHelpController = new SignatureHelpController (
                     sessionState.ClientSession.CompilationWorkspace);
 
-            var codeCells = await sessionState.EvaluationService.GetAllCodeCellsAsync (
-                Context.Connection.ConnectionAbortedToken);
-            var targetCodeCellState = codeCells.FirstOrDefault (c => c.Id == targetCodeCellId);
-
-            var signatureHelp = await sessionState.SignatureHelpController.ComputeSignatureHelpAsync (
-                targetCodeCellState.Buffer.CurrentText,
-                new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
-                Context.Connection.ConnectionAbortedToken);
+            var signatureHelp = await sessionState
+                .SignatureHelpController
+                .ComputeSignatureHelpAsync (
+                    (await sessionState.EvaluationService.GetCodeCellBufferAsync (
+                        targetCodeCellId,
+                        Context.Connection.ConnectionAbortedToken)).CurrentText,
+                    new Microsoft.CodeAnalysis.Text.LinePosition (lineNumber - 1, column - 1),
+                    Context.Connection.ConnectionAbortedToken);
 
             return signatureHelp;
         }

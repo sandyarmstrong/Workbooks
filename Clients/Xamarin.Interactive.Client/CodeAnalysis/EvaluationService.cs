@@ -46,6 +46,37 @@ namespace Xamarin.Interactive.CodeAnalysis
                 => inhibitions--;
         }
 
+        sealed class CodeCellState
+        {
+            public List<InteractiveDiagnostic> Diagnostics { get; } = new List<InteractiveDiagnostic> ();
+
+            public CodeCellId CodeCellId { get; }
+            public CodeCellBuffer Buffer { get; }
+
+            public bool IsDirty { get; set; }
+            public bool AgentTerminatedWhileEvaluating { get; set; }
+            public int EvaluationCount { get; set; }
+            public bool IsResultAnExpression { get; set; }
+            public Guid LastEvaluationRequestId { get; set; }
+
+            public CodeCellState (
+                CodeCellId codeCellId,
+                CodeCellBuffer buffer)
+            {
+                CodeCellId = codeCellId;
+                Buffer = buffer;
+            }
+
+            public bool IsEvaluationCandidate => IsDirty || EvaluationCount == 0;
+        }
+
+        sealed class EvaluationModel
+        {
+            public bool ShouldResetAgentState { get; set; }
+            public bool ShouldMaybeStartNewCodeCell { get; set; }
+            public List<CodeCellState> CellsToEvaluate { get; } = new List<CodeCellState> ();
+        }
+
         readonly Inhibitor evaluationInhibitor = new Inhibitor ();
 
         readonly RoslynCompilationWorkspace workspace;
@@ -114,11 +145,13 @@ namespace Xamarin.Interactive.CodeAnalysis
                     .Select (CodeCellIdExtensions.ToCodeCellId)
                     .FirstOrDefault ();
 
-                nugetReferenceCellState = await InsertCodeCellAsync (
+                var nugetReferenceCellId = await InsertCodeCellAsync (
                     string.Empty,
                     firstCodeCellId,
                     true,
                     cancellationToken);
+
+                nugetReferenceCellState = cellStates [nugetReferenceCellId];
             }
 
             // TODO: Prevent dupes. Return false if no changes made
@@ -143,7 +176,9 @@ namespace Xamarin.Interactive.CodeAnalysis
 
         void OnAgentMessage (object message)
         {
-            if (message is Evaluation evaluation)
+            if (message is Evaluation evaluation &&
+                cellStates.TryGetValue (evaluation.CodeCellId, out var cell) &&
+                cell.IsResultAnExpression)
                 events.Observers.OnNext (new CodeCellResultEvent (
                     evaluation.CodeCellId,
                     evaluation.ResultHandling,
@@ -160,14 +195,14 @@ namespace Xamarin.Interactive.CodeAnalysis
                 .Select (CodeCellIdExtensions.ToCodeCellId)
                 .ToImmutableList ();
 
-        public Task<ImmutableList<CodeCellState>> GetAllCodeCellsAsync (
+        Task<ImmutableList<CodeCellState>> GetAllCodeCellsAsync (
             CancellationToken cancellationToken = default)
             => Task.FromResult (
                 GetTopologicallySortedCodeCellIds ()
                 .Select (id => cellStates [id])
                 .ToImmutableList ());
 
-        public Task<CodeCellState> InsertCodeCellAsync (
+        public Task<CodeCellId> InsertCodeCellAsync (
             string initialBuffer = null,
             CodeCellId relativeToCodeCellId = default,
             bool insertBefore = false,
@@ -211,10 +246,10 @@ namespace Xamarin.Interactive.CodeAnalysis
 
             cellStates.Add (codeCellId, codeCellState);
 
-            return Task.FromResult (codeCellState);
+            return Task.FromResult (codeCellId);
         }
 
-        public Task<CodeCellState> UpdateCodeCellAsync (
+        public async Task<CodeCellUpdatedEvent> UpdateCodeCellAsync (
             CodeCellId codeCellId,
             string buffer,
             CancellationToken cancellationToken = default)
@@ -222,8 +257,21 @@ namespace Xamarin.Interactive.CodeAnalysis
             var cell = cellStates [codeCellId];
             cell.IsDirty = true;
             cell.Buffer.Value = buffer;
-            return Task.FromResult (cell);
+
+            var documentId = cell.CodeCellId.ToDocumentId ();
+
+            return new CodeCellUpdatedEvent (
+                cell.CodeCellId,
+                workspace.IsDocumentSubmissionComplete (documentId),
+                (await workspace.GetSubmissionCompilationDiagnosticsAsync (
+                    documentId, cancellationToken))
+                    .Select (d => (InteractiveDiagnostic)d).ToList ());
         }
+
+        public Task<CodeCellBuffer> GetCodeCellBufferAsync (
+            CodeCellId codeCellId,
+            CancellationToken cancellationToken = default)
+            => Task.FromResult (cellStates [codeCellId].Buffer);
 
         public Task RemoveCodeCellAsync (
             CodeCellId codeCellId,
@@ -244,7 +292,7 @@ namespace Xamarin.Interactive.CodeAnalysis
             return Task.CompletedTask;
         }
 
-        public async Task<EvaluationResult> EvaluateAsync (
+        public async Task EvaluateAsync (
             CodeCellId targetCodeCellId = default,
             bool evaluateAll = false,
             CancellationToken cancellationToken = default)
@@ -258,36 +306,28 @@ namespace Xamarin.Interactive.CodeAnalysis
                 await agentConnection.Api.ResetStateAsync ();
 
             foreach (var evaluatableCodeCell in evaluationModel.CellsToEvaluate) {
-                evaluatableCodeCell.Reset ();
-                evaluatableCodeCell.IsEvaluating = true;
-
                 events.Observers.OnNext (
-                    new CodeCellEvaluationStartedEvent (evaluatableCodeCell.Id));
+                    new CodeCellEvaluationStartedEvent (
+                        evaluatableCodeCell.CodeCellId));
 
-                switch (await CoreEvaluateCodeCellAsync (evaluatableCodeCell)) {
-                    case CodeCellEvaluationStatus.ErrorDiagnostic:
-                    case CodeCellEvaluationStatus.Disconnected:
-                    return new EvaluationResult (
-                        success: false,
-                        shouldStartNewCell: false,
-                        codeCellStates: evaluationModel.CellsToEvaluate);
+                var status = await CoreEvaluateCodeCellAsync (evaluatableCodeCell);
+
+                events.Observers.OnNext (new CodeCellEvaluationFinishedEvent (
+                    evaluatableCodeCell.CodeCellId,
+                    status,
+                    evaluationModel.ShouldMaybeStartNewCodeCell &&
+                        evaluatableCodeCell.CodeCellId == targetCodeCellId,
+                    evaluatableCodeCell.Diagnostics));
+
+                switch (status) {
+                case CodeCellEvaluationStatus.ErrorDiagnostic:
+                case CodeCellEvaluationStatus.Disconnected:
+                    return;
                 }
             }
-
-            return new EvaluationResult (
-                success: true,
-                shouldStartNewCell: evaluationModel.ShouldMaybeStartNewCodeCell,
-                codeCellStates: evaluationModel.CellsToEvaluate);
         }
 
-        internal sealed class EvaluationModel
-        {
-            public bool ShouldResetAgentState { get; set; }
-            public bool ShouldMaybeStartNewCodeCell { get; set; }
-            public List<CodeCellState> CellsToEvaluate { get; } = new List<CodeCellState> ();
-        }
-
-        internal async Task<EvaluationModel> GetEvaluationModelAsync (
+        async Task<EvaluationModel> GetEvaluationModelAsync (
             CodeCellId targetCodeCellId = default,
             bool evaluateAll = false,
             CancellationToken cancellationToken = default)
@@ -297,7 +337,7 @@ namespace Xamarin.Interactive.CodeAnalysis
 
             var targetCellIndex = evaluateAll
                 ? -1
-                : cells.FindIndex (cell => cell.Id == targetCodeCellId);
+                : cells.FindIndex (cell => cell.CodeCellId == targetCodeCellId);
 
             // we're either evaluating all cells head to tail or we failed to
             // find the target cell in the list; either way we're bailing early
@@ -320,7 +360,7 @@ namespace Xamarin.Interactive.CodeAnalysis
                 var shouldEvaluate = isTargetCell || cell.IsEvaluationCandidate;
 
                 if (!shouldEvaluate &&
-                    workspace.HaveAnyLoadDirectiveFilesChanged (cell.Id.ToDocumentId ())) {
+                    workspace.HaveAnyLoadDirectiveFilesChanged (cell.CodeCellId.ToDocumentId ())) {
                     // a trick to force Roslyn into invalidating the tree it's holding on
                     // to representing code pulled in via any #load directives in the cell.
                     cell.Buffer.Invalidate ();
@@ -338,7 +378,6 @@ namespace Xamarin.Interactive.CodeAnalysis
             // depend on state in previous cells which will become invalidated.
             for (var i = targetCellIndex + 1; i < cells.Count; i++) {
                 var cell = cells [i];
-
 
                 // if a cell was previously run but resulted in an agent termination,
                 // we do not want to automatically re-run that cell; the user must
@@ -366,7 +405,7 @@ namespace Xamarin.Interactive.CodeAnalysis
             CancellationToken cancellationToken = default)
         {
             if (!agentConnection.IsConnected) {
-                codeCellState.AppendDiagnostic (new InteractiveDiagnostic (
+                codeCellState.Diagnostics.Add (new InteractiveDiagnostic (
                     DiagnosticSeverity.Error,
                     "Cannot evaluate: not connected to agent."));
                 return CodeCellEvaluationStatus.Disconnected;
@@ -374,11 +413,10 @@ namespace Xamarin.Interactive.CodeAnalysis
 
             Compilation compilation = null;
             ExceptionNode exception = null;
-            bool agentTerminatedWhileEvaluating = false;
 
             try {
                 compilation = await workspace.GetSubmissionCompilationAsync (
-                    codeCellState.Id.ToDocumentId (),
+                    codeCellState.CodeCellId.ToDocumentId (),
                     evaluationEnvironment,
                     cancellationToken);
 
@@ -402,7 +440,7 @@ namespace Xamarin.Interactive.CodeAnalysis
                 .Filter ();
 
             foreach (var diagnostic in diagnostics)
-                codeCellState.AppendDiagnostic ((InteractiveDiagnostic)diagnostic);
+                codeCellState.Diagnostics.Add ((InteractiveDiagnostic)diagnostic);
 
             try {
                 if (compilation != null) {
@@ -417,33 +455,32 @@ namespace Xamarin.Interactive.CodeAnalysis
                 exception = e.XipErrorMessage.Exception;
             } catch (Exception e) {
                 Log.Error (TAG, "marking agent as terminated", e);
-                agentTerminatedWhileEvaluating = true;
-                codeCellState.AppendDiagnostic (new InteractiveDiagnostic (
+                codeCellState.AgentTerminatedWhileEvaluating = true;
+                codeCellState.Diagnostics.Add (new InteractiveDiagnostic (
                     DiagnosticSeverity.Error,
                     Catalog.GetString (
                         "The application terminated during evaluation of this cell. " +
                         "Run this cell manually to try again.")));
             }
 
-            codeCellState.IsEvaluating = false;
-
             CodeCellEvaluationStatus evaluationStatus;
 
             if (exception != null) {
                 events.Observers.OnNext (new CodeCellResultEvent (
-                    codeCellState.Id,
+                    codeCellState.CodeCellId,
                     EvaluationResultHandling.Replace,
                     FilterException (exception)));
                 evaluationStatus = CodeCellEvaluationStatus.EvaluationException;
             } else if (diagnostics.HasErrors) {
                 return CodeCellEvaluationStatus.ErrorDiagnostic;
-            } else if (agentTerminatedWhileEvaluating) {
+            } else if (codeCellState.AgentTerminatedWhileEvaluating) {
                 evaluationStatus = CodeCellEvaluationStatus.Disconnected;
             } else {
                 evaluationStatus = CodeCellEvaluationStatus.Success;
             }
 
-            codeCellState.NotifyEvaluated (agentTerminatedWhileEvaluating);
+            codeCellState.IsDirty = false;
+            codeCellState.EvaluationCount++;
 
             return evaluationStatus;
         }

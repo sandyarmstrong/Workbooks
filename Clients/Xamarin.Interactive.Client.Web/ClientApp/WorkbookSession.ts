@@ -7,13 +7,8 @@
 
 import { HubConnection } from '@aspnet/signalr'
 import { Event } from './utils/Events'
-import { CodeCellResult, EvaluationResult, CapturedOutputSegment, ICodeCellEvent } from './evaluation'
+import { CodeCellResult, CapturedOutputSegment, ICodeCellEvent, CodeCellUpdate } from './evaluation'
 import { Message, StatusUIAction, StatusUIActionHandler, StatusUIActionWithMessage } from './messages'
-
-export interface CodeCellUpdateResponse {
-    isSubmissionComplete: boolean
-    diagnostics: monaco.editor.IModelDecoration[]
-}
 
 export interface DotNetSdk {
     name: string
@@ -109,7 +104,7 @@ export class WorkbookSession {
         this.hubConnection.on(
             'CodeCellEvent',
             (e: ICodeCellEvent) => {
-                console.debug('Hub: CodeCellEvent: %O', e)
+                console.debug('Hub: CodeCellEvent: %O: %O', e.$type, e)
                 this.codeCellEvent.dispatch(e)
             })
     }
@@ -135,15 +130,15 @@ export class WorkbookSession {
         return this.hubConnection.invoke('InsertCodeCell', buffer, relativeToCodeCellId, false)
     }
 
-    updateCodeCell(codeCellId: string, buffer: string): Promise<CodeCellUpdateResponse> {
+    updateCodeCell(codeCellId: string, buffer: string): Promise<CodeCellUpdate> {
         return this.hubConnection.invoke('UpdateCodeCell', codeCellId, buffer)
     }
 
-    evaluate(codeCellId: string): Promise<EvaluationResult> {
+    evaluate(codeCellId: string): Promise<void> {
         return this.hubConnection.invoke('Evaluate', codeCellId, false)
     }
 
-    evaluateAll(): Promise<EvaluationResult> {
+    evaluateAll(): Promise<void> {
         return this.hubConnection.invoke('Evaluate', null, true)
     }
 

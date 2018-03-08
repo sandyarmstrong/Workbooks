@@ -7,7 +7,7 @@
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { WorkbookSession, CodeCellUpdateResponse } from '../WorkbookSession'
+import { WorkbookSession } from '../WorkbookSession'
 import { MonacoCellEditor, MonacoCellEditorProps } from './MonacoCellEditor'
 import { ContentBlock } from 'draft-js';
 import { EditorMessage } from '../utils/EditorMessages'
@@ -19,9 +19,12 @@ import { MonacoCellMapper } from '../utils/MonacoUtils'
 import {
     ICodeCellEvent,
     CodeCellEventType,
+    CodeCellUpdate,
     CodeCellResult,
     CodeCellResultHandling,
-    CapturedOutputSegment
+    CapturedOutputSegment,
+    CodeCellEvaluationStatus,
+    CodeCellEvaluationFinished
 } from '../evaluation'
 
 import {
@@ -152,39 +155,17 @@ export class CodeCell extends CodeCellView<CodeCellProps, CodeCellState> {
             .removeListener(this.onCodeCellEvent)
     }
 
-    async updateCodeCell(buffer: string): Promise<CodeCellUpdateResponse> {
+    async updateCodeCell(buffer: string): Promise<CodeCellUpdate | null> {
         if (this.state.codeCellId)
             return await this.shellContext.session.updateCodeCell(
                 this.state.codeCellId,
                 buffer)
-
-        return {
-            isSubmissionComplete: false,
-            diagnostics: []
-        }
+        return null
     }
 
     protected async startEvaluation(): Promise<void> {
-        if (this.state.codeCellId && this.state.status === CodeCellViewStatus.Ready) {
-            this.setState({ status: CodeCellViewStatus.Evaluating })
-
-            // TODO: I can't help but feel that this should be handled at a
-            //       higher level. The result has state info for potentially all
-            //       cells.
-            const result = await this.shellContext.session.evaluate(this.state.codeCellId)
-
-            if (result.shouldStartNewCell)
-                this.props.blockProps.appendNewCodeCell()
-
-            const codeCellState = result.codeCellStates.filter(s => s.id == this.state.codeCellId)[0]
-
-            // TODO: What about diags/etc for other cell states?
-            this.setState({
-                status: CodeCellViewStatus.Ready,
-                diagnostics: codeCellState.diagnostics,
-                isResultAnExpression: codeCellState.isResultAnExpression
-            })
-        }
+        if (this.state.codeCellId && this.state.status === CodeCellViewStatus.Ready)
+            this.shellContext.session.evaluate(this.state.codeCellId)
     }
 
     protected async abortEvaluation(): Promise<void> {
@@ -197,9 +178,18 @@ export class CodeCell extends CodeCellView<CodeCellProps, CodeCellState> {
         switch (event.$type) {
             case CodeCellEventType.EvaluationStarted:
                 this.setState({
+                    status: CodeCellViewStatus.Evaluating,
                     capturedOutput: []
                 })
                 break
+            case CodeCellEventType.EvaluationFinished:
+                const finished = event as CodeCellEvaluationFinished
+                this.setState({
+                    status: CodeCellViewStatus.Ready,
+                    diagnostics: finished.diagnostics
+                })
+                if (finished.shouldStartNewCell)
+                    this.props.blockProps.appendNewCodeCell()
             case CodeCellEventType.Result:
                 this.setStateFromResult(event as CodeCellResult)
                 break
