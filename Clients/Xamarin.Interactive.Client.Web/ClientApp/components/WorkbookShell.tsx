@@ -269,12 +269,10 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
                     notifyDismiss={() => this.hidePackageDialog()}
                     getIsHidden={() => this.state.isPackageDialogHidden}
                 />
-                <div className="WorkbookShell-content-container">
-                    <WorkbookEditor
-                        shellContext={this.shellContext}
-                        ref={(editor) => this.workbookEditor = editor }
-                        content='' />
-                </div>
+                <WorkbookEditor
+                    shellContext={this.shellContext}
+                    ref={(editor) => this.workbookEditor = editor }
+                    content=''/>
                 <div style={{ display: "none" }}>
                     <input
                         type="file"
