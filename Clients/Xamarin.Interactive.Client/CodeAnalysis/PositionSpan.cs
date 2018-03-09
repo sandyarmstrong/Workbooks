@@ -6,6 +6,7 @@
 // Licensed under the MIT License.
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Xamarin.Interactive.CodeAnalysis
 {
@@ -48,5 +49,10 @@ namespace Xamarin.Interactive.CodeAnalysis
                 span.EndLinePosition.Character + 1,
                 span.Path);
         }
+
+        public LinePositionSpan ToRoslyn ()
+            => new LinePositionSpan (
+                new LinePosition (StartLineNumber - 1, StartColumn - 1),
+                new LinePosition (EndLineNumber - 1, EndColumn - 1));
     }
 }

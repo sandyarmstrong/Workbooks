@@ -45,7 +45,7 @@ namespace Xamarin.Interactive.CodeAnalysis
                 => inhibitions--;
         }
 
-        sealed class CodeCellState
+        internal sealed class CodeCellState
         {
             public CodeCellId CodeCellId { get; }
             public CodeCellBuffer Buffer { get; }
@@ -67,7 +67,7 @@ namespace Xamarin.Interactive.CodeAnalysis
             public bool IsEvaluationCandidate => IsDirty || EvaluationCount == 0;
         }
 
-        sealed class EvaluationModel
+        internal sealed class EvaluationModel
         {
             public bool ShouldResetAgentState { get; set; }
             public bool ShouldMaybeStartNewCodeCell { get; set; }
@@ -185,7 +185,7 @@ namespace Xamarin.Interactive.CodeAnalysis
 
         #endregion
 
-        Task<ImmutableList<CodeCellState>> GetAllCodeCellsAsync (
+        internal Task<ImmutableList<CodeCellState>> GetAllCodeCellsAsync (
             CancellationToken cancellationToken = default)
             => Task.FromResult (workspace
                 .GetTopologicallySortedCellIds ()
@@ -280,7 +280,7 @@ namespace Xamarin.Interactive.CodeAnalysis
             return Task.CompletedTask;
         }
 
-        async Task<EvaluationModel> GetEvaluationModelAsync (
+        internal async Task<EvaluationModel> GetEvaluationModelAsync (
             CodeCellId targetCodeCellId = default,
             bool evaluateAll = false,
             CancellationToken cancellationToken = default)

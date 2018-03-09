@@ -48,22 +48,22 @@ namespace Xamarin.Interactive.CodeAnalysis
             var controller = CreateEvaluationService ();
 
             var submissionA = await controller.InsertCodeCellAsync ("buffer-a", default);
-            var submissionB = await controller.InsertCodeCellAsync ("buffer-b", submissionA.Id);
-            var submissionC = await controller.InsertCodeCellAsync ("buffer-c", submissionB.Id);
-            var submissionD = await controller.InsertCodeCellAsync ("buffer-d", submissionC.Id);
+            var submissionB = await controller.InsertCodeCellAsync ("buffer-b", submissionA);
+            var submissionC = await controller.InsertCodeCellAsync ("buffer-c", submissionB);
+            var submissionD = await controller.InsertCodeCellAsync ("buffer-d", submissionC);
 
             var all = (await controller.GetAllCodeCellsAsync ()).ToList ();
 
-            Assert.Equal (submissionA.Id, all [0].Id);
+            Assert.Equal (submissionA, all [0].CodeCellId);
             Assert.Equal ("buffer-a", all [0].Buffer.Value);
 
-            Assert.Equal (submissionB.Id, all [1].Id);
+            Assert.Equal (submissionB, all [1].CodeCellId);
             Assert.Equal ("buffer-b", all [1].Buffer.Value);
 
-            Assert.Equal (submissionC.Id, all [2].Id);
+            Assert.Equal (submissionC, all [2].CodeCellId);
             Assert.Equal ("buffer-c", all [2].Buffer.Value);
 
-            Assert.Equal (submissionD.Id, all [3].Id);
+            Assert.Equal (submissionD, all [3].CodeCellId);
             Assert.Equal ("buffer-d", all [3].Buffer.Value);
         }
 
@@ -73,22 +73,22 @@ namespace Xamarin.Interactive.CodeAnalysis
             var service = CreateEvaluationService ();
 
             var submissionC = await service.InsertCodeCellAsync ("buffer-c", default);
-            var submissionD = await service.InsertCodeCellAsync ("buffer-d", submissionC.Id);
-            var submissionB = await service.InsertCodeCellAsync ("buffer-b", submissionC.Id, true);
-            var submissionA = await service.InsertCodeCellAsync ("buffer-a", submissionB.Id, true);
+            var submissionD = await service.InsertCodeCellAsync ("buffer-d", submissionC);
+            var submissionB = await service.InsertCodeCellAsync ("buffer-b", submissionC, true);
+            var submissionA = await service.InsertCodeCellAsync ("buffer-a", submissionB, true);
 
             var all = (await service.GetAllCodeCellsAsync ()).ToList ();
 
-            Assert.Equal (submissionA.Id, all [0].Id);
+            Assert.Equal (submissionA, all [0].CodeCellId);
             Assert.Equal ("buffer-a", all [0].Buffer.Value);
 
-            Assert.Equal (submissionB.Id, all [1].Id);
+            Assert.Equal (submissionB, all [1].CodeCellId);
             Assert.Equal ("buffer-b", all [1].Buffer.Value);
 
-            Assert.Equal (submissionC.Id, all [2].Id);
+            Assert.Equal (submissionC, all [2].CodeCellId);
             Assert.Equal ("buffer-c", all [2].Buffer.Value);
 
-            Assert.Equal (submissionD.Id, all [3].Id);
+            Assert.Equal (submissionD, all [3].CodeCellId);
             Assert.Equal ("buffer-d", all [3].Buffer.Value);
         }
 
@@ -106,8 +106,8 @@ namespace Xamarin.Interactive.CodeAnalysis
             Assert.True (model.ShouldResetAgentState);
             Assert.Collection (
                 model.CellsToEvaluate,
-                s => Assert.Equal (allSubmissions [0].Id, s.Id),
-                s => Assert.Equal (allSubmissions [1].Id, s.Id));
+                s => Assert.Equal (allSubmissions [0].CodeCellId, s.CodeCellId),
+                s => Assert.Equal (allSubmissions [1].CodeCellId, s.CodeCellId));
         }
     }
 }

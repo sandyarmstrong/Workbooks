@@ -11,6 +11,8 @@ using Microsoft.CodeAnalysis;
 
 using Xunit;
 
+using Xamarin.Interactive.Compilation.Roslyn;
+
 namespace Xamarin.Interactive.CodeAnalysis
 {
     public sealed class SubmissionIdTests
@@ -39,9 +41,9 @@ namespace Xamarin.Interactive.CodeAnalysis
         public void DocumentIdConversions ()
         {
             var documentId = DocumentId.CreateNewId (ProjectId.CreateNewId ());
-            var submissionId = documentId.ToCodeCellId ();
-            var documentIdRoundTrip = submissionId.ToDocumentId ();
-            var submissionIdRoundTrip = documentIdRoundTrip.ToCodeCellId ();
+            var submissionId = RoslynCompilationWorkspace.ToCodeCellId (documentId);
+            var documentIdRoundTrip = RoslynCompilationWorkspace.ToDocumentId (submissionId);
+            var submissionIdRoundTrip = RoslynCompilationWorkspace.ToCodeCellId (documentIdRoundTrip);
             Assert.Equal (documentId, documentIdRoundTrip);
             Assert.Equal (submissionId, submissionIdRoundTrip);
             Assert.Equal (submissionId.Id, submissionIdRoundTrip.Id);
@@ -55,7 +57,7 @@ namespace Xamarin.Interactive.CodeAnalysis
         {
             CodeCellId emptySubmissionId = default;
             DocumentId emptyDocumentId = default;
-            DocumentId convertedSubmissionId = emptySubmissionId.ToDocumentId ();
+            DocumentId convertedSubmissionId = RoslynCompilationWorkspace.ToDocumentId (emptySubmissionId);
             Assert.Equal (emptyDocumentId, convertedSubmissionId);
         }
     }
