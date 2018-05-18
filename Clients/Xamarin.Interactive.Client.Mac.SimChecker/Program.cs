@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.MTouch;
 
 namespace Xamarin.Interactive.Mac.SimChecker
@@ -23,6 +24,8 @@ namespace Xamarin.Interactive.Mac.SimChecker
                 Environment.Exit (0);
                 return;
             }
+
+            Log.Initialize (new LogProvider (LogLevel.Info));
 
             string sdkRoot;
             try {

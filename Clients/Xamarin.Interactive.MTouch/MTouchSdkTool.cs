@@ -16,6 +16,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 using Xamarin.Interactive.I18N;
+using Xamarin.Interactive.Logging;
 
 namespace Xamarin.Interactive.MTouch
 {
@@ -62,7 +63,6 @@ namespace Xamarin.Interactive.MTouch
             };
 
             proc.Exited += (o, args) => {
-                Logging.Log.Info ("RunToolAsync", $"{fileName} exited");
                 if (proc.ExitCode == 0) {
                     try {
                         tcs.TrySetResult (proc.StandardOutput.ReadToEnd ());
@@ -73,13 +73,13 @@ namespace Xamarin.Interactive.MTouch
                     tcs.TrySetException (new Exception ($"'{fileName} {arguments}' exited with exit code {proc.ExitCode}"));
             };
 
-            Logging.Log.Info ("RunToolAsync", $"{fileName} {arguments}");
+            Log.Info (TAG, $"{fileName} {arguments}");
             proc.Start ();
 
             if (timeout > 0) {
                 Task.Run (() =>  {
                     if (!proc.WaitForExit (timeout)) {
-                        Logging.Log.Info ("RunToolAsync", $"TIMEOUT {fileName} {arguments}");
+                        Log.Info (TAG, $"TIMEOUT {fileName} {arguments}");
                         tcs.TrySetException (new TimeoutException ());
                         proc.Kill ();
                     }
@@ -100,8 +100,7 @@ namespace Xamarin.Interactive.MTouch
                     return await RunToolAsync (fileName, arguments, timeout);
                 } catch (TimeoutException e) {
                     if (i < (timeoutRetries - 1)) {
-                        Logging.Log.Info ("RunToolWithRetriesAsync", $"Failed with {e.GetType ()}, retrying");
-                        Console.Error.WriteLine (e);
+                        Log.Info (TAG, $"Failed with {e.GetType ()}, retrying");
                     } else
                         throw e;
                 }
@@ -131,7 +130,7 @@ namespace Xamarin.Interactive.MTouch
 
                 return Version.Parse (shortVersion);
             } catch (Exception e) {
-                Console.Error.WriteLine (e);
+                Log.Error (TAG, e);
                 return null;
             }
         }
@@ -150,7 +149,7 @@ namespace Xamarin.Interactive.MTouch
                 if (Directory.Exists (path))
                     return path;
             } catch (Exception e) {
-                Console.Error.WriteLine (e);
+                Log.Error (TAG, e);
             }
 
             return null;
@@ -180,8 +179,7 @@ namespace Xamarin.Interactive.MTouch
                 if (Directory.Exists (path))
                     return path;
             } catch (Exception e) {
-                Logging.Log.Error ("GetXamarinStudioXcodeSdkRootAsync", e);
-                Console.Error.WriteLine (e);
+                Log.Error (TAG, e);
             }
 
             return null;
