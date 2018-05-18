@@ -46,8 +46,10 @@ namespace Xamarin.Interactive.MTouch
             throw new MlaunchNotFoundException ();
         }
 
-        static string RunTool (string fileName, string arguments)
+        static Task<string> RunToolAsync (string fileName, string arguments, int timeout = 5000)
         {
+            var tcs = new TaskCompletionSource<string> ();
+
             var proc = new Process {
                 StartInfo = new ProcessStartInfo {
                     FileName = fileName,
@@ -55,31 +57,71 @@ namespace Xamarin.Interactive.MTouch
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
-                }
+                },
+                EnableRaisingEvents = true
             };
 
+            proc.Exited += (o, args) => {
+                Logging.Log.Info ("RunToolAsync", $"{fileName} exited");
+                if (proc.ExitCode == 0) {
+                    try {
+                        tcs.TrySetResult (proc.StandardOutput.ReadToEnd ());
+                    } catch (Exception e) {
+                        tcs.TrySetException (e);
+                    }
+                } else
+                    tcs.TrySetException (new Exception ($"'{fileName} {arguments}' exited with exit code {proc.ExitCode}"));
+            };
+
+            Logging.Log.Info ("RunToolAsync", $"{fileName} {arguments}");
             proc.Start ();
-            proc.WaitForExit ();
 
-            if (proc.ExitCode == 0)
-                return proc.StandardOutput.ReadToEnd ();
+            if (timeout > 0) {
+                Task.Run (() =>  {
+                    if (!proc.WaitForExit (timeout)) {
+                        Logging.Log.Info ("RunToolAsync", $"TIMEOUT {fileName} {arguments}");
+                        tcs.TrySetException (new TimeoutException ());
+                        proc.Kill ();
+                    }
+                });
+            }
 
-            throw new Exception ($"'{fileName} {arguments}' exited with exit code {proc.ExitCode}");
+            return tcs.Task;
         }
 
-        public static string GetXcodeSdkRoot ()
+        static async Task<string> RunToolWithRetriesAsync (
+            string fileName,
+            string arguments,
+            int timeoutRetries = 3,
+            int timeout = 5000)
+        {
+            for (var i = 0; i < timeoutRetries; i++) {
+                try {
+                    return await RunToolAsync (fileName, arguments, timeout);
+                } catch (TimeoutException e) {
+                    if (i < (timeoutRetries - 1)) {
+                        Logging.Log.Info ("RunToolWithRetriesAsync", $"Failed with {e.GetType ()}, retrying");
+                        Console.Error.WriteLine (e);
+                    } else
+                        throw e;
+                }
+            }
+            throw new Exception ($"Giving up on {fileName} after ${timeoutRetries} timeouts");
+        }
+
+        public static async Task<string> GetXcodeSdkRootAsync ()
         {
             // Mimicking VSmac behavior, xcode-select is checked last
-            var sdkRoot = GetXamarinStudioXcodeSdkRoot () ?? GetDefaultXCodeSdkRoot () ?? GetXcodeSelectXcodeSdkRoot ();
+            var sdkRoot = (await GetXamarinStudioXcodeSdkRootAsync ()) ?? GetDefaultXCodeSdkRoot () ?? (await GetXcodeSelectXcodeSdkRootAsync ());
             if (sdkRoot == null)
                 throw new Exception (Catalog.SharedStrings.XcodeNotFoundMessage);
             return sdkRoot;
         }
 
-        public static Version GetXcodeVersion (string sdkRoot)
+        public static async Task<Version> GetXcodeVersionAsync (string sdkRoot)
         {
             try {
-                var plistXml = RunTool (
+                var plistXml = await RunToolWithRetriesAsync (
                     "plutil",
                     $"-extract CFBundleShortVersionString xml1 \"{sdkRoot}/Contents/Info.plist\" -o -");
 
@@ -97,10 +139,10 @@ namespace Xamarin.Interactive.MTouch
         static string GetDefaultXCodeSdkRoot ()
             => Directory.Exists (DefaultSdkRoot) ? DefaultSdkRoot : null;
 
-        static string GetXcodeSelectXcodeSdkRoot ()
+        static async Task<string> GetXcodeSelectXcodeSdkRootAsync ()
         {
             try {
-                var path = RunTool ("xcode-select", "-p");
+                var path = await RunToolWithRetriesAsync ("xcode-select", "-p");
 
                 while (path != null && Path.GetExtension (path) != ".app")
                     path = Path.GetDirectoryName (path);
@@ -114,7 +156,7 @@ namespace Xamarin.Interactive.MTouch
             return null;
         }
 
-        static string GetXamarinStudioXcodeSdkRoot ()
+        static async Task<string> GetXamarinStudioXcodeSdkRootAsync ()
         {
             var settingsPlistPath = Path.Combine (
                 Environment.GetFolderPath (Environment.SpecialFolder.Personal),
@@ -127,7 +169,7 @@ namespace Xamarin.Interactive.MTouch
                 return null;
 
             try {
-                var plistXml = RunTool (
+                var plistXml = await RunToolWithRetriesAsync (
                     "plutil",
                     $"-extract AppleSdkRoot xml1 \"{settingsPlistPath}\" -o -");
 
@@ -138,6 +180,7 @@ namespace Xamarin.Interactive.MTouch
                 if (Directory.Exists (path))
                     return path;
             } catch (Exception e) {
+                Logging.Log.Error ("GetXamarinStudioXcodeSdkRootAsync", e);
                 Console.Error.WriteLine (e);
             }
 

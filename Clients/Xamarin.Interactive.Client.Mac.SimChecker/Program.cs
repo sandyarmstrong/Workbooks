@@ -26,14 +26,14 @@ namespace Xamarin.Interactive.Mac.SimChecker
 
             string sdkRoot;
             try {
-                sdkRoot = MTouchSdkTool.GetXcodeSdkRoot ();
+                sdkRoot = MTouchSdkTool.GetXcodeSdkRootAsync ().Result;
             } catch (Exception e) {
                 Console.Error.WriteLine (e.Message);
                 Environment.Exit (100); // Xcode not configured in XS or not installed at /Applications/Xcode.app
                 return;
             }
 
-            var xcodeVersion = MTouchSdkTool.GetXcodeVersion (sdkRoot);
+            var xcodeVersion = MTouchSdkTool.GetXcodeVersionAsync (sdkRoot).Result;
             if (xcodeVersion < MTouchSdkTool.RequiredMinimumXcodeVersion) {
                 Environment.Exit (105); // Xcode too old
                 return;
