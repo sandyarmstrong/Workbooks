@@ -12,7 +12,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Xamarin.Interactive.Client.ViewInspector;
+//using Xamarin.Interactive.Client.ViewInspector;
 using Xamarin.Interactive.Client.Windows.Commands;
 using Xamarin.Interactive.Editor;
 using Xamarin.Interactive.I18N;
@@ -22,6 +22,30 @@ using Xamarin.Interactive.Workbook.Structure;
 
 namespace Xamarin.Interactive.Client.Windows.Views
 {
+    // TODO: Pick a home for this, it comes from Client.Desktop project
+    class DelegateCommand : ICommand
+    {
+        readonly Action<object> execute;
+        readonly Predicate<object> canExecute;
+
+        public DelegateCommand (Action<object> action, Predicate<object> predicate) : this (action)
+            => canExecute = predicate ?? throw new ArgumentNullException (nameof (predicate));
+
+        public DelegateCommand (Action<object> action)
+            => execute = action ?? throw new ArgumentNullException (nameof (action));
+
+        public event EventHandler CanExecuteChanged;
+
+        public void InvalidateCanExecute ()
+            => CanExecuteChanged?.Invoke (this, new EventArgs ());
+
+        public bool CanExecute (object parameter)
+            => canExecute?.Invoke (parameter) ?? true;
+
+        public void Execute (object parameter)
+            => execute.Invoke (parameter);
+    }
+
     class MenuManager
     {
         readonly Menu rootMenu;

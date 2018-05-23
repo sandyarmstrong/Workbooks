@@ -262,7 +262,7 @@
                         PreviewKeyDown="ReplWebView_OnPreviewKeyDown"/>
                 </Grid>
             </TabItem>
-            <TabItem
+            <!--<TabItem
                 Header="View Inspector"
                 Visibility="{
                     Binding NoSupportedHierarchies,
@@ -334,7 +334,7 @@
                         AutomationProperties.Name="Selected view property editor"
                         Grid.Column="4"/>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </DockPanel>
 </Controls:MetroWindow>

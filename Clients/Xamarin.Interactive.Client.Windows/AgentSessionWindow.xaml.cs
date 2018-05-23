@@ -34,15 +34,15 @@ using Xamarin.Interactive.I18N;
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.NuGet;
 using Xamarin.Interactive.Preferences;
-using Xamarin.Interactive.PropertyEditor;
+//using Xamarin.Interactive.PropertyEditor;
 using Xamarin.Interactive.Workbook.LoadAndSave;
 using Xamarin.Interactive.Workbook.Structure;
 using Xamarin.Interactive.Workbook.Views;
 
-using Xamarin.Interactive.Client.PropertyEditor;
-using Xamarin.Interactive.Client.Windows.ViewModels;
+//using Xamarin.Interactive.Client.PropertyEditor;
+//using Xamarin.Interactive.Client.Windows.ViewModels;
 using Xamarin.Interactive.Client.Windows.Views;
-using Xamarin.Interactive.Client.ViewInspector;
+//using Xamarin.Interactive.Client.ViewInspector;
 
 using Xamarin.PropertyEditing.Themes;
 using Xamarin.PropertyEditing.Windows;
@@ -76,7 +76,7 @@ namespace Xamarin.Interactive.Client.Windows
         public static ClientSessionController<AgentSessionWindow> SessionController
             = new ClientSessionController<AgentSessionWindow> ();
 
-        public WpfViewInspector<AgentSessionWindow> ViewModel { get; }
+        //public WpfViewInspector<AgentSessionWindow> ViewModel { get; }
 
         public static AgentSessionWindow Open (ClientSessionUri clientSessionUri)
         {
@@ -196,13 +196,13 @@ namespace Xamarin.Interactive.Client.Windows
 
             InitializeComponent ();
             DataContext = this;
-            ViewModel = new WpfViewInspector<AgentSessionWindow> (Session, this);
+            //ViewModel = new WpfViewInspector<AgentSessionWindow> (Session, this);
             menuManager = new MenuManager (mainMenu, this, Session.SessionKind != ClientSessionKind.LiveInspection);
 
             replWebView.Loaded += HandleWebViewControlLoaded;
             replWebView.LoadCompleted += HandleWebViewSourceLoadCompleted;
 
-            propertyEditor.EditorProvider = new InteractiveEditorProvider (Session, new CommonPropertyViewHelper ());
+            //propertyEditor.EditorProvider = new InteractiveEditorProvider (Session, new CommonPropertyViewHelper ());
             PropertyEditorPanel.ThemeManager.Theme = PropertyEditorTheme.Light;
         }
 
@@ -248,7 +248,7 @@ namespace Xamarin.Interactive.Client.Windows
             base.OnClosed (e);
 
             preferenceSubscription?.Dispose ();
-            ViewModel?.Dispose ();
+            //ViewModel?.Dispose ();
 
             if (Session != null) {
                 Session.Dispose ();
@@ -299,10 +299,10 @@ namespace Xamarin.Interactive.Client.Windows
 
         bool ScrollToElementWithId (string fragment)
         {
-            if (!string.IsNullOrEmpty (fragment)) {
-                ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (fragment);
-                return true;
-            }
+            //if (!string.IsNullOrEmpty (fragment)) {
+            //    ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (fragment);
+            //    return true;
+            //}
 
             return false;
         }
@@ -394,8 +394,8 @@ namespace Xamarin.Interactive.Client.Windows
                     break;
                 case 1:
                     group.Focus ();
-                    if (ViewModel.SelectedView == null)
-                        ViewModel.RefreshVisualTreeAsync ().Forget ();
+                    //if (ViewModel.SelectedView == null)
+                    //    ViewModel.RefreshVisualTreeAsync ().Forget ();
 
                     var menuItem = (MenuItem)Resources ["viewMenu"];
                     if (menuItem.Parent == null)
@@ -417,33 +417,33 @@ namespace Xamarin.Interactive.Client.Windows
             webView.Document.DocumentElement.Style.SetProperty ("font-size", $"{fontSize}px");
         }
 
-        async void InspectModel_PropertyChanged (object sender, PropertyChangedEventArgs args)
-        {
-            switch (args.PropertyName) {
-                case "SelectedView":
-                    await SetSelectedViewAsync (ViewModel.SelectedView);
-                    break;
-            }
-        }
+        //async void InspectModel_PropertyChanged (object sender, PropertyChangedEventArgs args)
+        //{
+        //    switch (args.PropertyName) {
+        //        case "SelectedView":
+        //            await SetSelectedViewAsync (ViewModel.SelectedView);
+        //            break;
+        //    }
+        //}
 
-        public async Task SetSelectedViewAsync (XIR.InspectView view)
-        {
-            if (!Session.Agent.IsConnected)
-                return;
+        //public async Task SetSelectedViewAsync (XIR.InspectView view)
+        //{
+        //    if (!Session.Agent.IsConnected)
+        //        return;
 
-            if (string.IsNullOrEmpty (view?.PublicType))
-                return;
+        //    if (string.IsNullOrEmpty (view?.PublicType))
+        //        return;
 
-            var remoteProperty = await Session.Agent.Api.GetObjectMembersAsync (view.Handle);
+        //    var remoteProperty = await Session.Agent.Api.GetObjectMembersAsync (view.Handle);
 
-            propertyEditor.SelectedItems.Clear ();
-            propertyEditor.SelectedItems.Add (remoteProperty);
+        //    propertyEditor.SelectedItems.Clear ();
+        //    propertyEditor.SelectedItems.Add (remoteProperty);
 
-            if (!string.IsNullOrEmpty (view?.PublicCSharpType)
-                && Session.SessionKind == ClientSessionKind.LiveInspection)
-                await Session.EvaluationService.EvaluateAsync (
-                    $"var selectedView = GetObject<{view.PublicCSharpType}> (0x{view.Handle:x})");
-        }
+        //    if (!string.IsNullOrEmpty (view?.PublicCSharpType)
+        //        && Session.SessionKind == ClientSessionKind.LiveInspection)
+        //        await Session.EvaluationService.EvaluateAsync (
+        //            $"var selectedView = GetObject<{view.PublicCSharpType}> (0x{view.Handle:x})");
+        //}
 
         void OnClearHistory (object sender, ExecutedRoutedEventArgs e)
             => Session.ViewControllers.ReplHistory?.Clear ();
@@ -617,13 +617,13 @@ namespace Xamarin.Interactive.Client.Windows
         {
             webView = new XcbWebView (replWebView) { IsContextMenuEnabled = false };
 
-            Session.InitializeAsync (new WorkbookWebPageViewHost (webView)).Forget ();
+            //Session.InitializeAsync (new WorkbookWebPageViewHost (webView)).Forget ();
 
             Session.Workbook.EditorHub.Events.Subscribe (
                 new Observer<EditorEvent> (HandleEditorEvent));
 
             preferenceSubscription = PreferenceStore.Default.Subscribe (ObservePreferenceChange);
-            ViewModel.PropertyChanged += InspectModel_PropertyChanged;
+            //ViewModel.PropertyChanged += InspectModel_PropertyChanged;
 
             webView.NewWindow += ReplXcbWebView_NewWindow;
         }
@@ -633,16 +633,16 @@ namespace Xamarin.Interactive.Client.Windows
             cancel = HandleNavigation (new Uri (url));
         }
 
-        void OnInspectTreeSelected (object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (e.NewValue is InspectTreeNode viewNode)
-                ViewModel.RootModel.SelectedNode = viewNode;
-        }
+        //void OnInspectTreeSelected (object sender, RoutedPropertyChangedEventArgs<object> e)
+        //{
+        //    if (e.NewValue is InspectTreeNode viewNode)
+        //        ViewModel.RootModel.SelectedNode = viewNode;
+        //}
 
         void OnOutlineSelected (object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue is TableOfContentsNode toc)
-                ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (toc.Id);
+            //if (e.NewValue is TableOfContentsNode toc)
+            //    ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (toc.Id);
         }
 
         void HandleTabControlMouseDown (object sender, MouseButtonEventArgs e)

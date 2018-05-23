@@ -118,15 +118,9 @@
     <Compile Include="System\Windows\Input\WpfRoutedCommandFactory.cs" />
     <Compile Include="Themes\ThemeHelper.cs" />
     <Compile Include="UserPresentableExceptionHandler.cs" />
-    <Compile Include="ViewModels\InspectTreeNode3D.cs" />
-    <Compile Include="ViewModels\WpfViewInspector.cs" />
-    <Compile Include="Views\InspectTreeView.xaml.cs">
-      <DependentUpon>InspectTreeView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\OutlineItem.xaml.cs">
       <DependentUpon>OutlineItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WpfDolly.cs" />
     <Compile Include="Views\UpdaterWindow.xaml.cs">
       <DependentUpon>UpdaterWindow.xaml</DependentUpon>
     </Compile>
@@ -195,10 +189,6 @@
     <Page Include="Views\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\InspectTreeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MetroDialogWindow.xaml">
       <SubType>Designer</SubType>
@@ -273,10 +263,6 @@
       <Project>{6d864ab3-aab0-4d18-9ae2-68fe6383802f}</Project>
       <Name>Xamarin.CrossBrowser.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Xamarin.Interactive.Client.Desktop\Xamarin.Interactive.Client.Desktop.csproj">
-      <Project>{060f0356-3e5c-41cd-b2bd-4c15c99bebc2}</Project>
-      <Name>Xamarin.Interactive.Client.Desktop</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Xamarin.Interactive.Client\Xamarin.Interactive.Client.csproj">
       <Project>{ee61a762-761d-46b0-9dfa-1d0fd47f3e85}</Project>
       <Name>Xamarin.Interactive.Client</Name>
@@ -330,6 +316,9 @@
     <Resource Include="..\Xamarin.Interactive.Client.Mac\Resources\new-workbook-background.png">
       <Link>new-workbook-background.png</Link>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="Build.targets" />
