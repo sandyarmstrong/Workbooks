@@ -9,6 +9,21 @@
     <Import_RootNamespace>Xamarin.Interactive</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Client\ClientSession.cs" />
+    <Compile Remove="Client\ClientSessionController.cs" />
+    <Compile Remove="Client\ClientSessionEvent.cs" />
+    <Compile Remove="Client\IClientSessionViewControllers.cs" />
+    <Compile Remove="Client\ViewControllers\NewWorkbookItem.cs" />
+    <Compile Remove="Client\ViewControllers\NewWorkbookViewController.cs" />
+    <Compile Remove="Client\ViewControllers\WorkbookAppViewController.cs" />
+    <Compile Remove="Client\ViewControllers\WorkbookTargetsViewController.cs" />
+    <Compile Remove="NuGet\PackageManagerViewModel.cs" />
+    <Compile Remove="Workbook\Models\WorkbookPageViewModel.cs" />
+    <Compile Remove="Workbook\NewWorkbookFeatures\NewWorkbookFeature.cs" />
+    <Compile Remove="Workbook\NewWorkbookFeatures\XamarinFormsFeature.cs" />
+    <Compile Remove="Workbook\Views\IWorkbookPageHost.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="4.3.0" />
     <PackageReference Include="CommonMark.NET" Version="0.15.1-abock-workbooks.1384619" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
@@ -25,5 +40,9 @@
       <Link>ISSUE_TEMPLATE.md</Link>
       <LogicalName>ISSUE_TEMPLATE.md</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Client\ViewControllers\" />
+    <Folder Include="Workbook\NewWorkbookFeatures\" />
   </ItemGroup>
 </Project>

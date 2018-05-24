@@ -127,25 +127,25 @@ namespace Xamarin.Interactive.Client
             objects = objects.Remove (id);
         }
 
-        public Uri AddSession (ClientSession clientSession)
-        {
-            if (clientSession == null)
-                throw new ArgumentNullException (nameof (clientSession));
+        //public Uri AddSession (ClientSession clientSession)
+        //{
+        //    if (clientSession == null)
+        //        throw new ArgumentNullException (nameof (clientSession));
 
-            var sessionId = clientSession.Id.ToString ();
+        //    var sessionId = clientSession.Id.ToString ();
 
-            objects = objects.Add (sessionId, clientSession);
+        //    objects = objects.Add (sessionId, clientSession);
 
-            return new Uri (BaseUri, $"{workbookUriPrefix}{sessionId}/");
-        }
+        //    return new Uri (BaseUri, $"{workbookUriPrefix}{sessionId}/");
+        //}
 
-        public void RemoveSession (ClientSession clientSession)
-        {
-            if (clientSession == null)
-                throw new ArgumentNullException (nameof (clientSession));
+        //public void RemoveSession (ClientSession clientSession)
+        //{
+        //    if (clientSession == null)
+        //        throw new ArgumentNullException (nameof (clientSession));
 
-            objects = objects.Remove (clientSession.Id.ToString ());
-        }
+        //    objects = objects.Remove (clientSession.Id.ToString ());
+        //}
 
         /// <summary>
         /// Maps a URI to either a resource path relative to the workbook indicated in
@@ -227,35 +227,35 @@ namespace Xamarin.Interactive.Client
             string clientSessionId = requestPath.Substring (0, pathOffset);
             requestPath = requestPath.Substring (pathOffset + 1);
 
-            object maybeClientSession;
-            if (!objects.TryGetValue (clientSessionId, out maybeClientSession))
-                return ResourceAction.Invalid;
+            //object maybeClientSession;
+            //if (!objects.TryGetValue (clientSessionId, out maybeClientSession))
+            //    return ResourceAction.Invalid;
 
-            var session = maybeClientSession as ClientSession;
+            //var session = maybeClientSession as ClientSession;
 
-            if (session == null)
-                return ResourceAction.Invalid;
+            //if (session == null)
+            //    return ResourceAction.Invalid;
 
-            // if we have an empty relative request path, serve the actual client app
-            if (String.IsNullOrEmpty (requestPath)) {
-                localPath = clientResourcesBundledBasePath.Combine ("app.html");
-                return ResourceAction.InternalClientWebApp;
-            }
+            //// if we have an empty relative request path, serve the actual client app
+            //if (String.IsNullOrEmpty (requestPath)) {
+            //    localPath = clientResourcesBundledBasePath.Combine ("app.html");
+            //    return ResourceAction.InternalClientWebApp;
+            //}
 
-            // build the workbook-relative path
-            if (!session.Workbook.WorkingBasePath.IsNull)
-                localPath = session.Workbook.WorkingBasePath.Combine (requestPath);
+            //// build the workbook-relative path
+            //if (!session.Workbook.WorkingBasePath.IsNull)
+            //    localPath = session.Workbook.WorkingBasePath.Combine (requestPath);
 
-            // physical workbook-relative resource
-            if (localPath.FileExists)
-                return ResourceAction.WorkbookResource;
+            //// physical workbook-relative resource
+            //if (localPath.FileExists)
+            //    return ResourceAction.WorkbookResource;
 
-            // virtual workbook-relative resource?
-            Guid dependencyGuid;
-            if (Guid.TryParse (localPath.NameWithoutExtension, out dependencyGuid) &&
-                session.TryGetWebResource (dependencyGuid, out localPath) &&
-                localPath.FileExists)
-                return ResourceAction.WorkbookResource;
+            //// virtual workbook-relative resource?
+            //Guid dependencyGuid;
+            //if (Guid.TryParse (localPath.NameWithoutExtension, out dependencyGuid) &&
+            //    session.TryGetWebResource (dependencyGuid, out localPath) &&
+            //    localPath.FileExists)
+            //    return ResourceAction.WorkbookResource;
 
             return ResourceAction.Invalid;
         }
