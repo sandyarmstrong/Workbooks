@@ -51,7 +51,7 @@ using XIR = Xamarin.Interactive.Remote;
 
 namespace Xamarin.Interactive.Client.Windows
 {
-    partial class AgentSessionWindow : MetroWindow, INotifyPropertyChanged, IObserver<ClientSessionEvent>
+    partial class AgentSessionWindow : MetroWindow, INotifyPropertyChanged//, IObserver<ClientSessionEvent>
     {
         const string TAG = nameof (AgentSessionWindow);
 
@@ -60,7 +60,7 @@ namespace Xamarin.Interactive.Client.Windows
         IDisposable preferenceSubscription;
         XcbWebView webView;
 
-        public ClientSession Session { get; private set; }
+        //public ClientSession Session { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -73,8 +73,8 @@ namespace Xamarin.Interactive.Client.Windows
 
         public WpfDialogMessageViewDelegate DialogMessageViewDelegate { get; }
 
-        public static ClientSessionController<AgentSessionWindow> SessionController
-            = new ClientSessionController<AgentSessionWindow> ();
+        //public static ClientSessionController<AgentSessionWindow> SessionController
+        //    = new ClientSessionController<AgentSessionWindow> ();
 
         //public WpfViewInspector<AgentSessionWindow> ViewModel { get; }
 
@@ -82,8 +82,8 @@ namespace Xamarin.Interactive.Client.Windows
         {
             AgentSessionWindow window;
 
-            if (!SessionController.TryGetApplicationState (clientSessionUri, out window))
-                window = new AgentSessionWindow (clientSessionUri);
+            //if (!SessionController.TryGetApplicationState (clientSessionUri, out window))
+            window = new AgentSessionWindow (clientSessionUri);
 
             window.Show ();
             window.Activate ();
@@ -106,98 +106,98 @@ namespace Xamarin.Interactive.Client.Windows
 
         bool Save (SaveOperation operation)
         {
-            if (!CanSave)
-                return false;
+            //    if (!CanSave)
+            return false;
 
-            var saveOperation = Session.CreateWorkbookSaveOperation ();
-            var savePath = Session.Workbook.LogicalPath;
+            //    var saveOperation = Session.CreateWorkbookSaveOperation ();
+            //    var savePath = Session.Workbook.LogicalPath;
 
-            if (savePath.IsNull || operation == SaveOperation.SaveAs) {
-                var saveDialog = new CommonSaveFileDialog {
-                    Title = Catalog.GetString ("Save Workbook"),
-                    DefaultFileName = Session.Title,
-                    AlwaysAppendDefaultExtension = true,
-                    DefaultExtension = ".workbook"
-                };
+            //    if (savePath.IsNull || operation == SaveOperation.SaveAs) {
+            //        var saveDialog = new CommonSaveFileDialog {
+            //            Title = Catalog.GetString ("Save Workbook"),
+            //            DefaultFileName = Session.Title,
+            //            AlwaysAppendDefaultExtension = true,
+            //            DefaultExtension = ".workbook"
+            //        };
 
-                if (!savePath.IsNull)
-                    saveDialog.InitialDirectory = savePath.DirectoryExists
-                        ? savePath.ParentDirectory
-                        : savePath;
+            //        if (!savePath.IsNull)
+            //            saveDialog.InitialDirectory = savePath.DirectoryExists
+            //                ? savePath.ParentDirectory
+            //                : savePath;
 
-                saveDialog.FolderChanging += (o, e) => {
-                    if (e.Folder.EndsWith (".workbook", StringComparison.OrdinalIgnoreCase))
-                        e.Cancel = true;
-                };
+            //        saveDialog.FolderChanging += (o, e) => {
+            //            if (e.Folder.EndsWith (".workbook", StringComparison.OrdinalIgnoreCase))
+            //                e.Cancel = true;
+            //        };
 
-                saveDialog.Filters.Add (new CommonFileDialogFilter ("Xamarin Workbook", ".workbook"));
+            //        saveDialog.Filters.Add (new CommonFileDialogFilter ("Xamarin Workbook", ".workbook"));
 
-                CommonFileDialogComboBox formatComboBox = null;
+            //        CommonFileDialogComboBox formatComboBox = null;
 
-                if (saveOperation.SupportedOptions.HasFlag (WorkbookSaveOptions.Archive)) {
-                    formatComboBox = new CommonFileDialogComboBox ();
-                    formatComboBox.Items.Add (new CommonFileDialogComboBoxItem (
-                        Catalog.GetString ("Package Directory")));
-                    formatComboBox.Items.Add (new CommonFileDialogComboBoxItem (
-                        Catalog.GetString ("Archive")));
-                    formatComboBox.SelectedIndex = saveOperation.Options.HasFlag (
-                        WorkbookSaveOptions.Archive) ? 1 : 0;
+            //        if (saveOperation.SupportedOptions.HasFlag (WorkbookSaveOptions.Archive)) {
+            //            formatComboBox = new CommonFileDialogComboBox ();
+            //            formatComboBox.Items.Add (new CommonFileDialogComboBoxItem (
+            //                Catalog.GetString ("Package Directory")));
+            //            formatComboBox.Items.Add (new CommonFileDialogComboBoxItem (
+            //                Catalog.GetString ("Archive")));
+            //            formatComboBox.SelectedIndex = saveOperation.Options.HasFlag (
+            //                WorkbookSaveOptions.Archive) ? 1 : 0;
 
-                    var formatGroup = new CommonFileDialogGroupBox ("Workbook Format:");
-                    formatGroup.Items.Add (formatComboBox);
-                    saveDialog.Controls.Add (formatGroup);
-                }
+            //            var formatGroup = new CommonFileDialogGroupBox ("Workbook Format:");
+            //            formatGroup.Items.Add (formatComboBox);
+            //            saveDialog.Controls.Add (formatGroup);
+            //        }
 
-                if (saveDialog.ShowDialog (this) != CommonFileDialogResult.Ok)
-                    return false;
+            //        if (saveDialog.ShowDialog (this) != CommonFileDialogResult.Ok)
+            //            return false;
 
-                if (formatComboBox != null)
-                    switch (formatComboBox.SelectedIndex) {
-                    case 0:
-                        saveOperation.Options &= ~WorkbookSaveOptions.Archive;
-                        break;
-                    case 1:
-                        saveOperation.Options |= WorkbookSaveOptions.Archive;
-                        break;
-                    default:
-                        throw new IndexOutOfRangeException ();
-                    }
+            //        if (formatComboBox != null)
+            //            switch (formatComboBox.SelectedIndex) {
+            //            case 0:
+            //                saveOperation.Options &= ~WorkbookSaveOptions.Archive;
+            //                break;
+            //            case 1:
+            //                saveOperation.Options |= WorkbookSaveOptions.Archive;
+            //                break;
+            //            default:
+            //                throw new IndexOutOfRangeException ();
+            //            }
 
-                savePath = saveDialog.FileName;
+            //        savePath = saveDialog.FileName;
 
-                saveOperation.Destination = savePath;
-            }
+            //        saveOperation.Destination = savePath;
+            //    }
 
-            var success = false;
-            try {
-                Session.SaveWorkbook (saveOperation);
-                NoteRecentDocument ();
-                success = true;
-                IsDirty = false;
-            } catch (Exception e) {
-                Log.Error (TAG, e);
-            }
+            //    var success = false;
+            //    try {
+            //        Session.SaveWorkbook (saveOperation);
+            //        NoteRecentDocument ();
+            //        success = true;
+            //        IsDirty = false;
+            //    } catch (Exception e) {
+            //        Log.Error (TAG, e);
+            //    }
 
-            return success;
+            //    return success;
         }
 
-        public bool CanSave => Session.SessionKind == ClientSessionKind.Workbook;
+        public bool CanSave => ClientInfo.Flavor == ClientFlavor.Workbooks; // TODO: Session kind, not client kind
 
         AgentSessionWindow (ClientSessionUri clientSessionUri)
         {
             MessageViewDelegate = new WpfMessageViewDelegate (this);
             DialogMessageViewDelegate = new WpfDialogMessageViewDelegate (this);
 
-            Session = new ClientSession (clientSessionUri);
-            Session.InitializeViewControllers (
-                new WpfClientSessionViewControllers (MessageViewDelegate, DialogMessageViewDelegate));
+            //Session = new ClientSession (clientSessionUri);
+            //Session.InitializeViewControllers (
+            //    new WpfClientSessionViewControllers (MessageViewDelegate, DialogMessageViewDelegate));
 
-            SessionController.AddSession (Session, this);
+            //SessionController.AddSession (Session, this);
 
             InitializeComponent ();
             DataContext = this;
             //ViewModel = new WpfViewInspector<AgentSessionWindow> (Session, this);
-            menuManager = new MenuManager (mainMenu, this, Session.SessionKind != ClientSessionKind.LiveInspection);
+            menuManager = new MenuManager (mainMenu, this, ClientInfo.Flavor != ClientFlavor.Inspector);
 
             replWebView.Loaded += HandleWebViewControlLoaded;
             replWebView.LoadCompleted += HandleWebViewSourceLoadCompleted;
@@ -208,37 +208,37 @@ namespace Xamarin.Interactive.Client.Windows
 
         void NoteRecentDocument ()
         {
-            if (Session.Workbook.LogicalPath.Exists)
-                App.RecentDocuments?.Add (new RecentDocument (
-                    Session.Workbook.LogicalPath,
-                    Session.Workbook.Title
-                ));
+            //if (Session.Workbook.LogicalPath.Exists)
+            //    App.RecentDocuments?.Add (new RecentDocument (
+            //        Session.Workbook.LogicalPath,
+            //        Session.Workbook.Title
+            //    ));
         }
 
         protected override void OnClosing (CancelEventArgs e)
         {
-            if (IsDirty && CanSave) {
-                var dlg = new MetroDialogWindow {
-                    Owner = this,
-                    Title = "Unsaved Changes",
-                    Width = Width,
-                    Message = $"Do you want to save changes to {Session.Title}?",
-                    ButtonStyle = MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
-                    AffirmativeButtonText = "save",
-                    NegativeButtonText = "don't save",
-                };
-                dlg.ShowDialog ();
+            //if (IsDirty && CanSave) {
+            //    var dlg = new MetroDialogWindow {
+            //        Owner = this,
+            //        Title = "Unsaved Changes",
+            //        Width = Width,
+            //        Message = $"Do you want to save changes to {Session.Title}?",
+            //        ButtonStyle = MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
+            //        AffirmativeButtonText = "save",
+            //        NegativeButtonText = "don't save",
+            //    };
+            //    dlg.ShowDialog ();
 
-                if (dlg.Result == MessageDialogResult.Affirmative) {
-                    if (!Save (SaveOperation.Save)) {
-                        e.Cancel = true;
-                        return;
-                    }
-                } else if (dlg.Result == MessageDialogResult.FirstAuxiliary) {
-                    e.Cancel = true;
-                    return;
-                }
-            }
+            //    if (dlg.Result == MessageDialogResult.Affirmative) {
+            //        if (!Save (SaveOperation.Save)) {
+            //            e.Cancel = true;
+            //            return;
+            //        }
+            //    } else if (dlg.Result == MessageDialogResult.FirstAuxiliary) {
+            //        e.Cancel = true;
+            //        return;
+            //    }
+            //}
 
             base.OnClosing (e);
         }
@@ -250,10 +250,10 @@ namespace Xamarin.Interactive.Client.Windows
             preferenceSubscription?.Dispose ();
             //ViewModel?.Dispose ();
 
-            if (Session != null) {
-                Session.Dispose ();
-                SessionController.RemoveSession (Session);
-            }
+            //if (Session != null) {
+            //    Session.Dispose ();
+            //    SessionController.RemoveSession (Session);
+            //}
 
             App.CheckNeedsExit ();
         }
@@ -266,7 +266,7 @@ namespace Xamarin.Interactive.Client.Windows
         void HandleWebViewControlLoaded (object sender, RoutedEventArgs e)
         {
             replWebView.Loaded -= HandleWebViewControlLoaded;
-            Session.Subscribe (this);
+            //Session.Subscribe (this);
         }
 
         bool HandleNavigation (Uri uri)
@@ -446,7 +446,9 @@ namespace Xamarin.Interactive.Client.Windows
         //}
 
         void OnClearHistory (object sender, ExecutedRoutedEventArgs e)
-            => Session.ViewControllers.ReplHistory?.Clear ();
+        {
+            // Session.ViewControllers.ReplHistory?.Clear ();
+        }
 
         void OnIncreaseFont (object sender, ExecutedRoutedEventArgs e)
             => Prefs.UI.Font.Update (UIFontPreference.UpdateAction.Increase);
@@ -538,80 +540,80 @@ namespace Xamarin.Interactive.Client.Windows
 
         void CanNewCommandExecute (object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Session.SessionKind == ClientSessionKind.Workbook;
+            e.CanExecute = ClientInfo.Flavor == ClientFlavor.Workbooks;
             e.Handled = true;
         }
 
         void CanOpenCommandExecute (object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Session.SessionKind == ClientSessionKind.Workbook;
+            e.CanExecute = ClientInfo.Flavor == ClientFlavor.Workbooks;
             e.Handled = true;
         }
 
-        async void OnExecuteAllCommandExecuted (object sender, ExecutedRoutedEventArgs args)
+        /*async*/ void OnExecuteAllCommandExecuted (object sender, ExecutedRoutedEventArgs args)
         {
-            try {
-                await Session.EvaluationService.EvaluateAllAsync ();
-            } catch (Exception e) {
-                Log.Error (TAG, e);
-            }
+            //try {
+            //    await Session.EvaluationService.EvaluateAllAsync ();
+            //} catch (Exception e) {
+            //    Log.Error (TAG, e);
+            //}
         }
 
         void CanExecuteAllCommandExecute (object sender, CanExecuteRoutedEventArgs args)
         {
-            args.CanExecute = Session.SessionKind == ClientSessionKind.Workbook && Session.CanEvaluate;
+            args.CanExecute = false;// Session.SessionKind == ClientSessionKind.Workbook && Session.CanEvaluate;
             args.Handled = true;
         }
 
-        void OnRemovePackageCommandExecuted (object sender, ExecutedRoutedEventArgs args)
-        {
-            var package = (args.Parameter as NuGetPackageNode)?.RepresentedObject as InteractivePackage;
+        //void OnRemovePackageCommandExecuted (object sender, ExecutedRoutedEventArgs args)
+        //{
+        //    var package = (args.Parameter as NuGetPackageNode)?.RepresentedObject as InteractivePackage;
 
-            if (package != null)
-                Session.Workbook.Packages.RemovePackage (package);
-        }
+        //    if (package != null)
+        //        Session.Workbook.Packages.RemovePackage (package);
+        //}
 
-        void OnAddPackageCommandExecuted (object sender, ExecutedRoutedEventArgs args)
-        {
-            if (Session.CanAddPackages)
-                new PackageManagerWindow (Session) { Owner = this }.ShowDialog ();
-        }
+        //void OnAddPackageCommandExecuted (object sender, ExecutedRoutedEventArgs args)
+        //{
+        //    if (Session.CanAddPackages)
+        //        new PackageManagerWindow (Session) { Owner = this }.ShowDialog ();
+        //}
 
-        void CanExecuteAddPackageCommand (object sender, CanExecuteRoutedEventArgs args)
-        {
-            args.CanExecute = Session.CanAddPackages;
-            args.Handled = true;
-        }
+        //void CanExecuteAddPackageCommand (object sender, CanExecuteRoutedEventArgs args)
+        //{
+        //    args.CanExecute = Session.CanAddPackages;
+        //    args.Handled = true;
+        //}
 
         void HandleEditorEvent (EditorEvent evnt)
         {
             if (evnt is IDocumentDirtyEvent)
                 IsDirty = true;
-            else if (evnt is FocusEvent)
-                menuManager.Update (Session.Workbook.EditorHub);
+            //else if (evnt is FocusEvent)
+            //    menuManager.Update (Session.Workbook.EditorHub);
         }
 
-        void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent evnt)
-        {
-            switch (evnt.Kind) {
-            case ClientSessionEventKind.SessionAvailable:
-                OnSessionAvailable ();
-                break;
-            // TODO: When pages branch lands make sure this detects changes to all pages
-            case ClientSessionEventKind.SessionTitleUpdated:
-                NoteRecentDocument ();
-                if (Session.Workbook.IsDirty)
-                    IsDirty = true;
-                break;
-            }
-        }
+        //void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent evnt)
+        //{
+        //    switch (evnt.Kind) {
+        //    case ClientSessionEventKind.SessionAvailable:
+        //        OnSessionAvailable ();
+        //        break;
+        //    // TODO: When pages branch lands make sure this detects changes to all pages
+        //    case ClientSessionEventKind.SessionTitleUpdated:
+        //        NoteRecentDocument ();
+        //        if (Session.Workbook.IsDirty)
+        //            IsDirty = true;
+        //        break;
+        //    }
+        //}
 
-        void IObserver<ClientSessionEvent>.OnError (Exception error)
-        {
-        }
+        //void IObserver<ClientSessionEvent>.OnError (Exception error)
+        //{
+        //}
 
-        void IObserver<ClientSessionEvent>.OnCompleted ()
-            => Close ();
+        //void IObserver<ClientSessionEvent>.OnCompleted ()
+        //    => Close ();
 
         void OnSessionAvailable ()
         {
@@ -619,8 +621,8 @@ namespace Xamarin.Interactive.Client.Windows
 
             //Session.InitializeAsync (new WorkbookWebPageViewHost (webView)).Forget ();
 
-            Session.Workbook.EditorHub.Events.Subscribe (
-                new Observer<EditorEvent> (HandleEditorEvent));
+            //Session.Workbook.EditorHub.Events.Subscribe (
+            //    new Observer<EditorEvent> (HandleEditorEvent));
 
             preferenceSubscription = PreferenceStore.Default.Subscribe (ObservePreferenceChange);
             //ViewModel.PropertyChanged += InspectModel_PropertyChanged;

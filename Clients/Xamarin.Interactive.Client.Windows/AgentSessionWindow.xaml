@@ -91,9 +91,9 @@
         <CommandBinding Command="{x:Static commands:Commands.ResetFontSize}" Executed="OnResetFontSize"/>
         <CommandBinding Command="{x:Static commands:Commands.ExecuteAll}" Executed="OnExecuteAllCommandExecuted" CanExecute="CanExecuteAllCommandExecute" />
         <CommandBinding Command="{x:Static commands:Commands.ClearHistory}" Executed="OnClearHistory" />
-        <CommandBinding Command="{x:Static commands:Commands.RemovePackage}" Executed="OnRemovePackageCommandExecuted"/>
+        <!--<CommandBinding Command="{x:Static commands:Commands.RemovePackage}" Executed="OnRemovePackageCommandExecuted"/>
         <CommandBinding Command="{x:Static structure:NuGetPackageNode.RemovePackage}" Executed="OnRemovePackageCommandExecuted" CanExecute="CanExecuteAddPackageCommand"/>
-        <CommandBinding Command="{x:Static structure:NuGetPackagesNode.AddPackage}" Executed="OnAddPackageCommandExecuted" CanExecute="CanExecuteAddPackageCommand"/>
+        <CommandBinding Command="{x:Static structure:NuGetPackagesNode.AddPackage}" Executed="OnAddPackageCommandExecuted" CanExecute="CanExecuteAddPackageCommand"/>-->
         <CommandBinding Command="New" Executed="OnNewCommandExecuted" CanExecute="CanNewCommandExecute"/>
         <CommandBinding Command="Open" Executed="OnOpenCommandExecuted" CanExecute="CanOpenCommandExecute"/>
         <CommandBinding Command="Save" Executed="OnSaveCommandExecuted" CanExecute="CanSaveCommandExecute"/>
@@ -107,7 +107,7 @@
         <KeyBinding Key="D0" Modifiers="Control" Command="{x:Static commands:Commands.ResetFontSize}"/>
         <KeyBinding Key="D1" Modifiers="Control" Command="{Binding ViewModel.ShowPaneCommand}" CommandParameter="0"/>
         <KeyBinding Key="D2" Modifiers="Control" Command="{Binding ViewModel.ShowPaneCommand}" CommandParameter="1"/>
-        <KeyBinding Key="G" Modifiers="Control" Command="{x:Static structure:NuGetPackagesNode.AddPackage}"/>
+        <!--<KeyBinding Key="G" Modifiers="Control" Command="{x:Static structure:NuGetPackagesNode.AddPackage}"/>-->
     </Window.InputBindings>
 
     <Controls:MetroWindow.TitleTemplate>

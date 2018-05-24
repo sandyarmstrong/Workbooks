@@ -125,7 +125,6 @@
       <DependentUpon>UpdaterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowsClientApp.cs" />
-    <Compile Include="WpfClientSessionViewControllers.cs" />
     <Compile Include="WpfDialogMessageViewDelegate.cs" />
     <Compile Include="WpfMessageViewDelegate.cs" />
     <Compile Include="Commands\AboutCommand.cs" />
@@ -140,7 +139,6 @@
     <Compile Include="Core\iOSCoordinateMapper.cs" />
     <Compile Include="Core\WindowsAndroidCoordinateMapper.cs" />
     <Compile Include="Core\WpfCoordinateMapper.cs" />
-    <Compile Include="Highlighter.cs" />
     <Compile Include="Views\MultiFrameImage.cs" />
     <Compile Include="NativeWebBrowserEventHandler.cs" />
     <Compile Include="Preferences\RegistryPreferenceStore.cs" />
@@ -151,14 +149,8 @@
     <Compile Include="Views\MetroDialogWindow.xaml.cs">
       <DependentUpon>MetroDialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\NewWorkbookWindow.xaml.cs">
-      <DependentUpon>NewWorkbookWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\PackageManagerWindow.xaml.cs">
-      <DependentUpon>PackageManagerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ViewHighlightOverlayWindow.xaml.cs">
       <DependentUpon>ViewHighlightOverlayWindow.xaml</DependentUpon>
@@ -194,19 +186,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\NewWorkbookWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\OptionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\OutlineItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\PackageManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

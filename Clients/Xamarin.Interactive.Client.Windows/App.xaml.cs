@@ -40,7 +40,7 @@ namespace Xamarin.Interactive.Client.Windows
     {
         const string TAG = nameof (App);
 
-        static NewWorkbookWindow standaloneWindow;
+        //static NewWorkbookWindow standaloneWindow;
 
         static FilePath appAssemblyPath = Assembly.GetExecutingAssembly ().Location;
 
@@ -249,14 +249,16 @@ namespace Xamarin.Interactive.Client.Windows
                 Current.Shutdown ();
         }
 
-        public static void ShowStandaloneWindow (AgentType? agentType = null)
+        public static void ShowStandaloneWindow ()//(AgentType? agentType = null)
         {
-            if (standaloneWindow == null)
-                standaloneWindow = new NewWorkbookWindow ();
-            if (agentType.HasValue)
-                standaloneWindow.SelectedAgentType = agentType.Value;
-            standaloneWindow.Show ();
-            standaloneWindow.Activate ();
+            // TODO: Launch new browser window
+
+            //if (standaloneWindow == null)
+            //    standaloneWindow = new NewWorkbookWindow ();
+            //if (agentType.HasValue)
+            //    standaloneWindow.SelectedAgentType = agentType.Value;
+            //standaloneWindow.Show ();
+            //standaloneWindow.Activate ();
         }
 
         public static void OpenWorkbook ()
