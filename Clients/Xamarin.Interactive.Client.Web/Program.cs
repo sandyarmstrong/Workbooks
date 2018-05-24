@@ -68,7 +68,7 @@ namespace Xamarin.Interactive.Client.Web
             }
 
             if (endpoints.Count == 0)
-                endpoints.Add (new IPEndPoint (IPAddress.Loopback, 5000));
+                endpoints.Add (new IPEndPoint (IPAddress.Loopback, 0));
 
             return WebHost.CreateDefaultBuilder (args)
                 .UseStartup<Startup> ()
