@@ -211,8 +211,9 @@ export class WorkbookEditor extends React.Component<WorkbooksEditorProps, Workbo
     }
 
     setUpInitialState(): any {
-        const newBlocks = convertFromHTML("<h1>Welcome to Workbooks!</h1>").contentBlocks.concat(
-            this.createNewEmptyBlock("code-block"))
+        console.log("SETTING UP INITIAL STATE")
+        const newBlocks = //convertFromHTML("<h1>Welcome to Workbooks!</h1>").contentBlocks.concat(
+            [ this.createNewEmptyBlock("code-block") ]
 
         const newContentState = ContentState.createFromBlockArray(newBlocks);
         const newEditorState = EditorState.createWithContent(newContentState);

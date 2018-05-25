@@ -85,6 +85,10 @@ export class WorkbookSession {
         return this._availableWorkbookTargets
     }
 
+    timeout(ms: number) {
+        return new Promise(res => setTimeout(res, ms))
+    }
+
     constructor() {
         this.sessionEvent = new Event(<WorkbookSession>this)
         this.statusUIActionEvent = new Event(<WorkbookSession>this)
@@ -95,6 +99,10 @@ export class WorkbookSession {
     }
 
     async connect(): Promise<void> {
+
+        console.log('before timeout')
+        await this.timeout(10000)
+        console.log('after timeout')
         await this.hubConnection.start()
 
         this._availableWorkbookTargets = <WorkbookTarget[]>await this.hubConnection.invoke(
@@ -156,6 +164,7 @@ export class WorkbookSession {
     }
 
     onSessionEventReceived(event: SessionEvent): void {
+        console.log('WorkbookSession')
         event = resolveJsonReferences(event)
 
         console.log('WorkbookSession::onSessionEventReceived: %O, data: %O', event.kind, event.data)

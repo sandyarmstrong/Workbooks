@@ -33,6 +33,8 @@ using Xamarin.Interactive.I18N;
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.Preferences;
 using Xamarin.Interactive.SystemInformation;
+using System.Diagnostics;
+using Xamarin.ProcessControl;
 
 namespace Xamarin.Interactive.Client.Windows
 {
@@ -107,7 +109,7 @@ namespace Xamarin.Interactive.Client.Windows
 
             ThemeHelper.Initialize (this);
 
-            Xamarin.Interactive.CodeAnalysis.Resolving.GacCache.Initialize ();
+            //Xamarin.Interactive.CodeAnalysis.Resolving.GacCache.Initialize ();
 
             if (ClientInfo.Flavor == ClientFlavor.Workbooks) {
                 var jumpList = new JumpList (
@@ -259,6 +261,32 @@ namespace Xamarin.Interactive.Client.Windows
             //    standaloneWindow.SelectedAgentType = agentType.Value;
             //standaloneWindow.Show ();
             //standaloneWindow.Activate ();
+
+            // "C:\Program Files\dotnet\dotnet.exe" exec "C:\Users\sandy\xam-git\workbooks\Clients\Xamarin.Interactive.Client.Web\bin\Debug\netcoreapp2.0\workbooks-server.dll"
+            // TODO: Kill when this process dies (can pass it this pid to watch)
+            //Exec.RunAsync (
+            //    segment => {
+            //        if (segment.FileDescriptor != ConsoleRedirection.FileDescriptor.Output)
+            //            return;
+
+            //        // TODO: Is this ever localized?
+            //        var nowListening = "Now listening on: ";
+            //        var i = segment.Data.IndexOf (nowListening);
+            //        if (i < 0)
+            //            return;
+            //        var url = segment
+            //            .Data
+            //            .Substring (i + nowListening.Length)
+            //            .Split ('\n') [0]
+            //            .Trim ();
+
+            //        MainThread.Post(() => AgentSessionWindow.Open (new Uri (url)));
+            //    },
+            //    "dotnet",
+            //    "exec",
+            //    @"C:\Users\sandy\xam-git\workbooks\Clients\Xamarin.Interactive.Client.Web\bin\Debug\netcoreapp2.0\workbooks-server.dll").Forget ();
+
+            AgentSessionWindow.Open (new Uri ("http://127.0.0.1:5825"));
         }
 
         public static void OpenWorkbook ()

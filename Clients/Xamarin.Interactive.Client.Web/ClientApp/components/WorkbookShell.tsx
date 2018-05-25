@@ -65,6 +65,7 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
     }
 
     private onSessionEvent(session: WorkbookSession, sessionEvent: SessionEvent) {
+        console.log("SESSION EVENT")
         if (sessionEvent.kind === SessionEventKind.Ready) {
             this.workspaceAvailable = true
             if (this.workbookEditor)

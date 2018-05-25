@@ -80,10 +80,16 @@ namespace Xamarin.Interactive.Client.Windows
 
         public static AgentSessionWindow Open (ClientSessionUri clientSessionUri)
         {
+            // TODO
+            return null;
+        }
+
+        public static AgentSessionWindow Open (Uri clientServerUri)
+        {
             AgentSessionWindow window;
 
             //if (!SessionController.TryGetApplicationState (clientSessionUri, out window))
-            window = new AgentSessionWindow (clientSessionUri);
+            window = new AgentSessionWindow (clientServerUri);
 
             window.Show ();
             window.Activate ();
@@ -183,8 +189,12 @@ namespace Xamarin.Interactive.Client.Windows
 
         public bool CanSave => ClientInfo.Flavor == ClientFlavor.Workbooks; // TODO: Session kind, not client kind
 
-        AgentSessionWindow (ClientSessionUri clientSessionUri)
+        readonly Uri clientServerUri;
+
+        AgentSessionWindow (Uri clientServerUri) //ClientSessionUri clientSessionUri)
         {
+            this.clientServerUri = clientServerUri;
+
             MessageViewDelegate = new WpfMessageViewDelegate (this);
             DialogMessageViewDelegate = new WpfDialogMessageViewDelegate (this);
 
@@ -267,6 +277,8 @@ namespace Xamarin.Interactive.Client.Windows
         {
             replWebView.Loaded -= HandleWebViewControlLoaded;
             //Session.Subscribe (this);
+            OnSessionAvailable ();
+            webView.Navigate (clientServerUri);
         }
 
         bool HandleNavigation (Uri uri)
@@ -325,38 +337,38 @@ namespace Xamarin.Interactive.Client.Windows
             // to the browser control when this window is activated.
             Activated += (o, e) => webView.Focus ();
 
-            // since most of the REPL is monospace and the major focus of the UI, increasing
-            // the default font size by two points helps a lot for legibility and rendering
-            // of the font itself.
-            Prefs.UI.Font.DefaultFontSize = FontSize + 2;
-            Prefs.UI.Font.MinFontSize = Prefs.UI.Font.DefaultFontSize / 2;
+            //// since most of the REPL is monospace and the major focus of the UI, increasing
+            //// the default font size by two points helps a lot for legibility and rendering
+            //// of the font itself.
+            //Prefs.UI.Font.DefaultFontSize = FontSize + 2;
+            //Prefs.UI.Font.MinFontSize = Prefs.UI.Font.DefaultFontSize / 2;
 
-            var styleElement = (HtmlStyleElement)webView.Document.CreateElement ("style");
-            webView.Document.Head.AppendChild (styleElement);
-            styleElement.Sheet.InsertRule ($"body {{ font-family: '{FontFamily}' !important; }}", 0);
+            //var styleElement = (HtmlStyleElement)webView.Document.CreateElement ("style");
+            //webView.Document.Head.AppendChild (styleElement);
+            //styleElement.Sheet.InsertRule ($"body {{ font-family: '{FontFamily}' !important; }}", 0);
 
-            // hack because we can't set a preferred/default 'monospace' font family globally
-            // on IE like we can with WebKit, so we must override everything that explicitly
-            // uses monospace for now :(
-            styleElement.Sheet.InsertRule (@"
-                pre,
-                code,
-                .interactive-workspace > article.submission > section > .diagnostics ul,
-                .exception .stack-frame,
-                .renderer-base .to-string-representation,
-                .renderer-captured-output,
-                .renderer-enumerable > header::before,
-                .renderer-enumerable > header.expanded::before,
-                .renderer-enumerable > ol > li::before,
-                .renderer-help td:first-child,
-                .renderer-object > table > tbody > tr > th,
-                .renderer-object > table > tbody > tr > td,
-                .CodeMirror,
-                .CodeMirror-hints,
-                .CodeMirror-dialog input {
-                    font-family: 'Consolas', 'Lucida Console', monospace !important;
-                }
-            ", 0);
+            //// hack because we can't set a preferred/default 'monospace' font family globally
+            //// on IE like we can with WebKit, so we must override everything that explicitly
+            //// uses monospace for now :(
+            //styleElement.Sheet.InsertRule (@"
+            //    pre,
+            //    code,
+            //    .interactive-workspace > article.submission > section > .diagnostics ul,
+            //    .exception .stack-frame,
+            //    .renderer-base .to-string-representation,
+            //    .renderer-captured-output,
+            //    .renderer-enumerable > header::before,
+            //    .renderer-enumerable > header.expanded::before,
+            //    .renderer-enumerable > ol > li::before,
+            //    .renderer-help td:first-child,
+            //    .renderer-object > table > tbody > tr > th,
+            //    .renderer-object > table > tbody > tr > td,
+            //    .CodeMirror,
+            //    .CodeMirror-hints,
+            //    .CodeMirror-dialog input {
+            //        font-family: 'Consolas', 'Lucida Console', monospace !important;
+            //    }
+            //", 0);
 
             browserEventHandler = new NativeWebBrowserEventHandler (replWebView);
             browserEventHandler.BeforeNavigate += (o, args) => {
