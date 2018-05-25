@@ -85,7 +85,7 @@ export class WorkbookSession {
         return this._availableWorkbookTargets
     }
 
-    timeout(ms: number) {
+    delay(ms: number) {
         return new Promise(res => setTimeout(res, ms))
     }
 
@@ -100,9 +100,9 @@ export class WorkbookSession {
 
     async connect(): Promise<void> {
 
-        console.log('before timeout')
-        await this.timeout(10000)
-        console.log('after timeout')
+        // console.log('before timeout')
+        // await this.delay(10000)
+        // console.log('after timeout')
         await this.hubConnection.start()
 
         this._availableWorkbookTargets = <WorkbookTarget[]>await this.hubConnection.invoke(
