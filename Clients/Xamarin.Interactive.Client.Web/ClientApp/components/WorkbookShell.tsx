@@ -223,14 +223,17 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
     }
 
     saveWorkbook() {
-        if (this.workbookEditor != null && this.workbook != null) {
+        if (this.workbookEditor != null) {
             const contentToSave = this.workbookEditor.getContentToSave()
-            const saveableManifest = this.workbook.getManifestToSave()
+            // TODO: Generate manifest for new workbook (when this.workbook is not set)
+            // TODO: Update manifest packages as packages are added/removed from workbook
+            const saveableManifest = this.workbook ? this.workbook.getManifestToSave() : {}
             const workbook = matter.stringify(contentToSave, saveableManifest, {
                 delims: ["---", "---\n"]
             })
-            var blob = new Blob([workbook], { type: "text/markdown;charset=utf-8" })
-            saveAs(blob, `${this.workbook.manifest.title}.workbook`)
+            const blob = new Blob([workbook], { type: "text/markdown;charset=utf-8" })
+            const title = this.workbook ? this.workbook.manifest.title : "untitled"
+            saveAs(blob, `${title}.workbook`)
         }
     }
 
