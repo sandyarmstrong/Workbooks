@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 
@@ -34,6 +35,16 @@ namespace Xamarin.Interactive.Client.Web
                 { "" },
                 { "h|help", "Show this help.",
                     v => showHelp = true },
+                { "p|ppid=", "Tie server lifetime to the lifetime of the specified process ID",
+                    v => {
+                        if (!int.TryParse(v, out var ppid))
+                            throw new FormatException($"Invalid process ID: {v}");
+                        // This throws its own decent error if there is no process with that pid
+                        var parentProcess = Process.GetProcessById(ppid);
+                        parentProcess.EnableRaisingEvents = true;
+                        parentProcess.Exited += (o, e) => Environment.Exit (0);
+                    }
+                },
                 { "l|listen=", "Listen on endpoint (e.g. 0.0.0.0:5000)",
                     v => {
                         var endpoint = v.Split (':');
