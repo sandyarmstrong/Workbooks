@@ -46,8 +46,12 @@ namespace Xamarin.Interactive.Client.Windows
 
             void HandleOutput (ConsoleRedirection.Segment segment)
             {
-                if (segment.FileDescriptor != ConsoleRedirection.FileDescriptor.Output)
+                if (segment.FileDescriptor != ConsoleRedirection.FileDescriptor.Output) {
+                    if (segment.FileDescriptor == ConsoleRedirection.FileDescriptor.Error)
+                        Console.Error.Write (segment.Data);
                     return;
+                }
+
                 // TODO: Remove. This is just for testing convenience right now.
                 Console.Write (segment.Data);
 
