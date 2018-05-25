@@ -84,12 +84,12 @@ namespace Xamarin.Interactive.Client.Windows
             return null;
         }
 
-        public static AgentSessionWindow Open (Uri clientServerUri)
+        public static AgentSessionWindow Open ()
         {
             AgentSessionWindow window;
 
             //if (!SessionController.TryGetApplicationState (clientSessionUri, out window))
-            window = new AgentSessionWindow (clientServerUri);
+            window = new AgentSessionWindow ();
 
             window.Show ();
             window.Activate ();
@@ -189,12 +189,8 @@ namespace Xamarin.Interactive.Client.Windows
 
         public bool CanSave => ClientInfo.Flavor == ClientFlavor.Workbooks; // TODO: Session kind, not client kind
 
-        readonly Uri clientServerUri;
-
-        AgentSessionWindow (Uri clientServerUri) //ClientSessionUri clientSessionUri)
+        AgentSessionWindow () //ClientSessionUri clientSessionUri)
         {
-            this.clientServerUri = clientServerUri;
-
             MessageViewDelegate = new WpfMessageViewDelegate (this);
             DialogMessageViewDelegate = new WpfDialogMessageViewDelegate (this);
 
@@ -278,7 +274,8 @@ namespace Xamarin.Interactive.Client.Windows
             replWebView.Loaded -= HandleWebViewControlLoaded;
             //Session.Subscribe (this);
             OnSessionAvailable ();
-            webView.Navigate (clientServerUri);
+            ClientServerService.SharedInstance.GetUriAsync ().ContinueWith (
+                t => MainThread.Post (() => webView.Navigate (t.Result)));
         }
 
         bool HandleNavigation (Uri uri)
@@ -326,6 +323,7 @@ namespace Xamarin.Interactive.Client.Windows
         /// </summary>
         void HandleWebViewSourceLoadCompleted (object sender, NavigationEventArgs navigationArgs)
         {
+            Log.Debug (TAG, "HandleWebViewSourceLoadCompleted");
             // should never get more than one source load (because we only ever set it once,
             // but this is to keep sanity since the entire agent/client init process kicks
             // off here. It's not good to happen multiple times ;)
