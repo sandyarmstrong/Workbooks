@@ -70,7 +70,7 @@
                     FalseValue="Collapsed"/>
             </Controls:WindowCommands.Resources>
             <Menu x:Name="mainMenu" Background="Transparent"/>
-            <ComboBox
+            <!--<ComboBox
                 Visibility="{Binding
                     Session.ViewControllers.WorkbookTargets.IsVisible,
                     Converter={StaticResource visibilityConverter}}"
@@ -81,7 +81,7 @@
                 IsSynchronizedWithCurrentItem="True"
                 ItemContainerStyle="{DynamicResource ComboBoxItem}"
                 ToolTip="Change the active workbook target platform">
-            </ComboBox>
+            </ComboBox>-->
         </Controls:WindowCommands>
     </Controls:MetroWindow.LeftWindowCommands>
 
@@ -176,7 +176,7 @@
             </StatusBarItem>
         </StatusBar>
 
-        <TabControl
+        <!--<TabControl
             TabStripPlacement="Top"
             SelectedIndex="{Binding ViewModel.SelectedPane, Mode=TwoWay}"
             SelectionChanged="HandleSelectedPaneChanged"
@@ -250,7 +250,7 @@
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                         </TreeView>
-                    </DockPanel>
+                    </DockPanel>-->
 
                     <!-- AutomationProperties.Name is set to "Workbook editor" or "REPL editor" -->
                     <WebBrowser
@@ -260,8 +260,8 @@
                         AutomationProperties.Name="{Binding ViewModel.IsInspector, Converter={StaticResource replHeaderConverter}, StringFormat={}{0} editor}"
                         AutomationProperties.AutomationId="WorkbookWebBrowser"
                         PreviewKeyDown="ReplWebView_OnPreviewKeyDown"/>
-                </Grid>
-            </TabItem>
+                <!--</Grid>
+            </TabItem>-->
             <!--<TabItem
                 Header="View Inspector"
                 Visibility="{
@@ -335,6 +335,6 @@
                         Grid.Column="4"/>
                 </Grid>
             </TabItem>-->
-        </TabControl>
+        <!--</TabControl>-->
     </DockPanel>
 </Controls:MetroWindow>
