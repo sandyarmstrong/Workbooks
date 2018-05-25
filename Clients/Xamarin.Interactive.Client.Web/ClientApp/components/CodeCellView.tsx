@@ -37,7 +37,7 @@ export interface ResultRendererRepresentationMap {
 export interface CodeCellResultRendererState {
     result: CodeCellResult
     representations: ResultRendererRepresentationMap
-    selectedRepresentationKey: string
+    selectedRepresentationKey: string | null
 }
 
 export const enum CodeCellViewStatus {
@@ -84,7 +84,8 @@ export abstract class CodeCellView<
         const rendererState = {
             result: result,
             representations: mapReps,
-            selectedRepresentationKey: flatReps[0].key
+            // TODO: Investigate why we get 2 results per submission, and first always lacks reps
+            selectedRepresentationKey: flatReps[0] ? flatReps[0].key : null
         }
 
         if (!resultHandling)
