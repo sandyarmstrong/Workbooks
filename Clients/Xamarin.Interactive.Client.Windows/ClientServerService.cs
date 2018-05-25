@@ -75,9 +75,7 @@ namespace Xamarin.Interactive.Client.Windows
                     (clientServerUri != null && segment.Data.Contains (applicationStarted));
 
                 if (clientServerLaunched)
-                    Task.Delay (500).ContinueWith (t => {
-                        tcs.TrySetResult (clientServerUri);
-                    });
+                    tcs.TrySetResult (clientServerUri);
             }
 
             // TODO: Support launching packaged server
