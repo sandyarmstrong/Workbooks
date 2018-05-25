@@ -94,7 +94,7 @@ namespace Xamarin.CrossBrowser
 
         void FocusDocument ()
         {
-            if (parentWindow.IsActive)
+            if (parentWindow.IsActive && webBrowser.Document != null)
                 ((IHTMLDocument4) webBrowser.Document).focus ();
         }
 
