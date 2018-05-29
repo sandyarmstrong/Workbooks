@@ -132,10 +132,6 @@
       <DependentUpon>NewWorkbookCollectionView.cs</DependentUpon>
     </Compile>
     <Compile Include="AutoFitTextField.cs" />
-    <Compile Include="ViewInspector\InspectorSCNView.cs" />
-    <Compile Include="ViewInspector\InspectViewNode.cs" />
-    <Compile Include="ViewInspector\InspectViewMaterial.cs" />
-    <Compile Include="ViewInspector\SceneKitDolly.cs" />
     <Compile Include="PackageManagerWindow.cs" />
     <Compile Include="PackageManagerWindow.designer.cs">
       <DependentUpon>PackageManagerWindow.cs</DependentUpon>
@@ -183,7 +179,6 @@
     <Compile Include="SessionDocument.cs" />
     <Compile Include="SessionViewController.cs" />
     <Compile Include="SessionDocumentController.cs" />
-    <Compile Include="SessionToolbarDelegate.cs" />
     <Compile Include="VisualRepViewController.cs" />
     <Compile Include="VisualRepViewController.designer.cs">
       <DependentUpon>VisualRepViewController.cs</DependentUpon>
@@ -215,7 +210,6 @@
     <Compile Include="StatusToolbarView.designer.cs">
       <DependentUpon>StatusToolbarView.cs</DependentUpon>
     </Compile>
-    <Compile Include="MacClientSessionViewControllers.cs" />
     <Compile Include="AgentProcesses\iOSAgentProcess.cs" />
     <Compile Include="AgentProcesses\MacAgentProcess.cs" />
     <Compile Include="AgentProcesses\NSTaskExtensions.cs" />
@@ -341,6 +335,12 @@
     <None Include="WebKit\WebKitApi.cs" />
     <None Include="Inspector.plist" />
     <None Include="Workbooks.plist" />
+    <None Include="ViewInspector\InspectorSCNView.cs" />
+    <None Include="ViewInspector\InspectViewNode.cs" />
+    <None Include="ViewInspector\InspectViewMaterial.cs" />
+    <None Include="ViewInspector\SceneKitDolly.cs" />
+    <None Include="MacClientSessionViewControllers.cs" />
+    <None Include="SessionToolbarDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\ToolbarConsoleTemplate.pdf" />
@@ -392,7 +392,7 @@
       <Name>Xamarin.CrossBrowser.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Agents\Xamarin.Interactive\Xamarin.Interactive.csproj">
-      <Project>{955F473A-04EC-4716-B75E-509BA892499B}</Project>
+      <Project>{4737FF0B-723F-50AE-9DDE-A670AEDA9B29}</Project>
       <Name>Xamarin.Interactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Xamarin.PropertyEditing\Xamarin.PropertyEditing\Xamarin.PropertyEditing.csproj">
@@ -404,19 +404,15 @@
       <Name>Xamarin.PropertyEditing.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\Xamarin.Interactive.Client\Xamarin.Interactive.Client.csproj">
-      <Project>{EE61A762-761D-46B0-9DFA-1D0FD47F3E85}</Project>
+      <Project>{77494A40-61B7-59F7-B726-04430607B731}</Project>
       <Name>Xamarin.Interactive.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Xamarin.Interactive.Client.Desktop\Xamarin.Interactive.Client.Desktop.csproj">
-      <Project>{060F0356-3E5C-41CD-B2BD-4C15C99BEBC2}</Project>
-      <Name>Xamarin.Interactive.Client.Desktop</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\CodeAnalysis\Xamarin.Interactive.CodeAnalysis\Xamarin.Interactive.CodeAnalysis.csproj">
-      <Project>{A9F6D23D-68D5-41F6-8C00-DF2895560B74}</Project>
+      <Project>{3F8EB17A-74D6-5E26-88E9-853BA4F6A1B4}</Project>
       <Name>Xamarin.Interactive.CodeAnalysis</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\CodeAnalysis\Xamarin.Interactive.CodeAnalysis.Roslyn\Xamarin.Interactive.CodeAnalysis.Roslyn.csproj">
-      <Project>{E2D65824-E20F-4011-825A-FAEC2347F521}</Project>
+      <Project>{536ADEFE-7824-5A77-AA67-97FC060D3E51}</Project>
       <Name>Xamarin.Interactive.CodeAnalysis.Roslyn</Name>
     </ProjectReference>
   </ItemGroup>

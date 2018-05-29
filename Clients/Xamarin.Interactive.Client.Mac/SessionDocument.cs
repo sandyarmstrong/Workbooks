@@ -23,7 +23,7 @@ using Xamarin.Interactive.Workbook.Models;
 namespace Xamarin.Interactive.Client.Mac
 {
     [Register (nameof (SessionDocument))]
-    sealed class SessionDocument : NSDocument, IObserver<ClientSessionEvent>
+    sealed class SessionDocument : NSDocument//, IObserver<ClientSessionEvent>
     {
         const string TAG = nameof (SessionDocument);
 
@@ -38,7 +38,9 @@ namespace Xamarin.Interactive.Client.Mac
 
         SessionWindowController sessionWindowController;
 
-        public ClientSession Session { get; private set; }
+        //public ClientSession Session { get; private set; }
+
+        public ClientSessionKind SessionKind { get; private set; }
 
         SessionDocument (IntPtr handle) : base (handle)
         {
@@ -56,10 +58,10 @@ namespace Xamarin.Interactive.Client.Mac
 
             InstanceForWindowControllers = null;
 
-            Session.Subscribe (this);
+            //Session.Subscribe (this);
 
-            Session.Workbook.EditorHub.Events.Subscribe (
-                new Observer<EditorEvent> (HandleEditorEvent));
+            //Session.Workbook.EditorHub.Events.Subscribe (
+                //new Observer<EditorEvent> (HandleEditorEvent));
 
             AddWindowController (sessionWindowController);
 
@@ -71,7 +73,7 @@ namespace Xamarin.Interactive.Client.Mac
 
         public override string DefaultDraftName => WorkbookPage.DefaultTitle;
 
-        public override string DisplayName => Session.Title;
+        public override string DisplayName => "";//Session.Title;
 
         public override void Close ()
         {
@@ -81,25 +83,25 @@ namespace Xamarin.Interactive.Client.Mac
 
         #region IObserver<ClientSessionEvent>
 
-        void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent value)
-        {
-            if (value.Kind == ClientSessionEventKind.SessionTitleUpdated && Session.Workbook.IsDirty)
-                UpdateChangeCount (NSDocumentChangeType.Done);
-        }
+        //void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent value)
+        //{
+        //    if (value.Kind == ClientSessionEventKind.SessionTitleUpdated && Session.Workbook.IsDirty)
+        //        UpdateChangeCount (NSDocumentChangeType.Done);
+        //}
 
-        void IObserver<ClientSessionEvent>.OnError (Exception error)
-        {
-        }
+        //void IObserver<ClientSessionEvent>.OnError (Exception error)
+        //{
+        //}
 
-        void IObserver<ClientSessionEvent>.OnCompleted ()
-            => Close ();
+        //void IObserver<ClientSessionEvent>.OnCompleted ()
+            //=> Close ();
 
         #endregion
 
         #region Workbook Load & Save
 
         public override bool IsDocumentEdited
-            => Session.SessionKind == ClientSessionKind.Workbook && base.IsDocumentEdited;
+            => SessionKind == ClientSessionKind.Workbook && base.IsDocumentEdited;
 
         void HandleEditorEvent (EditorEvent obj)
         {
@@ -112,7 +114,7 @@ namespace Xamarin.Interactive.Client.Mac
             switch (sel.Name) {
             case "saveDocument:":
             case "saveDocumentAs:":
-                return Session.SessionKind == ClientSessionKind.Workbook;
+                return SessionKind == ClientSessionKind.Workbook;
             }
 
             return base.RespondsToSelector (sel);
@@ -143,7 +145,9 @@ namespace Xamarin.Interactive.Client.Mac
                 } else
                     uri = url;
 
-                Session = new ClientSession ((ClientSessionUri)uri);
+                SessionKind = ((ClientSessionUri)uri).SessionKind;
+
+                //Session = new ClientSession ((ClientSessionUri)uri);
             } catch (Exception e) {
                 e.ToUserPresentable (Catalog.Format (Catalog.GetString (
                     "“{0}” could not be opened.",
@@ -168,34 +172,34 @@ namespace Xamarin.Interactive.Client.Mac
 
             outError = AppDelegate.SuppressionNSError;
 
-            try {
-                if (workbookSaveOperation == null)
-                    workbookSaveOperation = Session.CreateWorkbookSaveOperation ();
+        //    try {
+        //        if (workbookSaveOperation == null)
+        //            workbookSaveOperation = Session.CreateWorkbookSaveOperation ();
 
-                switch (saveOperation) {
-                case NSSaveOperationType.Save:
-                case NSSaveOperationType.InPlace:
-                case NSSaveOperationType.Autosave:
-                    break;
-                default:
-                    workbookSaveOperation.Destination = url.Path;
-                    break;
-                }
+        //        switch (saveOperation) {
+        //        case NSSaveOperationType.Save:
+        //        case NSSaveOperationType.InPlace:
+        //        case NSSaveOperationType.Autosave:
+        //            break;
+        //        default:
+        //            workbookSaveOperation.Destination = url.Path;
+        //            break;
+        //        }
 
-                Session.SaveWorkbook (workbookSaveOperation);
-            } catch (Exception e) {
-                e.ToUserPresentable (Catalog.Format (Catalog.GetString (
-                    "“{0}” could not be saved.",
-                    comment: "'{0}' is a URL"),
-                    url)).Present ();
-                return false;
-            } finally {
-                workbookSaveOperation = null;
-            }
+        //        Session.SaveWorkbook (workbookSaveOperation);
+        //    } catch (Exception e) {
+        //        e.ToUserPresentable (Catalog.Format (Catalog.GetString (
+        //            "“{0}” could not be saved.",
+        //            comment: "'{0}' is a URL"),
+        //            url)).Present ();
+        //        return false;
+        //    } finally {
+        //        workbookSaveOperation = null;
+        //    }
 
-            outError = null;
-            return true;
-        }
+        //    outError = null;
+        //    return true;
+        //}
 
         public override bool ShouldRunSavePanelWithAccessoryView => false;
 
@@ -223,48 +227,48 @@ namespace Xamarin.Interactive.Client.Mac
 
         public override bool PrepareSavePanel (NSSavePanel savePanel)
         {
-            workbookSaveOperation = Session.CreateWorkbookSaveOperation ();
-            if (workbookSaveOperation.SupportedOptions == WorkbookSaveOptions.None)
-                return true;
+            //workbookSaveOperation = Session.CreateWorkbookSaveOperation ();
+            //if (workbookSaveOperation.SupportedOptions == WorkbookSaveOptions.None)
+            //    return true;
 
-            var stackView = new NSStackView {
-                Orientation = NSUserInterfaceLayoutOrientation.Vertical,
-                Spacing = 8,
-                EdgeInsets = new NSEdgeInsets (12, 12, 12, 12)
-            };
+            //var stackView = new NSStackView {
+            //    Orientation = NSUserInterfaceLayoutOrientation.Vertical,
+            //    Spacing = 8,
+            //    EdgeInsets = new NSEdgeInsets (12, 12, 12, 12)
+            //};
 
-            Action<NSView> addRow = row => {
-                stackView.AddView (row, NSStackViewGravity.Top);
-                stackView.AddConstraint (NSLayoutConstraint.Create (
-                    row,
-                    NSLayoutAttribute.Width,
-                    NSLayoutRelation.Equal,
-                    stackView,
-                    NSLayoutAttribute.Width,
-                    1,
-                    0));
-            };
+            //Action<NSView> addRow = row => {
+            //    stackView.AddView (row, NSStackViewGravity.Top);
+            //    stackView.AddConstraint (NSLayoutConstraint.Create (
+            //        row,
+            //        NSLayoutAttribute.Width,
+            //        NSLayoutRelation.Equal,
+            //        stackView,
+            //        NSLayoutAttribute.Width,
+            //        1,
+            //        0));
+            //};
 
-            if (workbookSaveOperation.SupportedOptions.HasFlag (WorkbookSaveOptions.Archive))
-                addRow (CreateRow (
-                    Catalog.GetString ("Workbook Format:"),
-                    new [] {
-                        Catalog.GetString ("Package Directory"),
-                        Catalog.GetString ("Archive")
-                    },
-                    workbookSaveOperation.Options.HasFlag (WorkbookSaveOptions.Archive) ? 1 : 0,
-                    index => {
-                        switch (index) {
-                        case 0:
-                            workbookSaveOperation.Options &= ~WorkbookSaveOptions.Archive;
-                            break;
-                        case 1:
-                            workbookSaveOperation.Options |= WorkbookSaveOptions.Archive;
-                            break;
-                        default:
-                            throw new IndexOutOfRangeException ();
-                        }
-                    }));
+            //if (workbookSaveOperation.SupportedOptions.HasFlag (WorkbookSaveOptions.Archive))
+                //addRow (CreateRow (
+                    //Catalog.GetString ("Workbook Format:"),
+                    //new [] {
+                    //    Catalog.GetString ("Package Directory"),
+                    //    Catalog.GetString ("Archive")
+                    //},
+                    //workbookSaveOperation.Options.HasFlag (WorkbookSaveOptions.Archive) ? 1 : 0,
+                    //index => {
+                    //    switch (index) {
+                    //    case 0:
+                    //        workbookSaveOperation.Options &= ~WorkbookSaveOptions.Archive;
+                    //        break;
+                    //    case 1:
+                    //        workbookSaveOperation.Options |= WorkbookSaveOptions.Archive;
+                    //        break;
+                    //    default:
+                    //        throw new IndexOutOfRangeException ();
+                    //    }
+                    //}));
 
             #if false
             // stubbed UI for signing is unused for now
@@ -278,7 +282,7 @@ namespace Xamarin.Interactive.Client.Mac
                     index => { }));
             #endif
 
-            savePanel.AccessoryView = stackView;
+            //savePanel.AccessoryView = stackView;
 
             return true;
         }

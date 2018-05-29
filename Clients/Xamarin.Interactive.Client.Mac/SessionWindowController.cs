@@ -22,7 +22,7 @@ namespace Xamarin.Interactive.Client.Mac
         public SessionWindowTabViewController TabViewController
             => (SessionWindowTabViewController)ContentViewController;
 
-        public ClientSession Session { get; private set; }
+        //public ClientSession Session { get; private set; }
 
         SessionWindowController (IntPtr handle) : base (handle)
         {
@@ -32,14 +32,14 @@ namespace Xamarin.Interactive.Client.Mac
         {
             MainThread.Ensure ();
 
-            Session = SessionDocument.InstanceForWindowControllers?.Session;
-            if (Session == null) {
-                Log.Error (TAG, "Unable to get ClientSession from SessionDocument");
-                throw new InvalidOperationException ();
-            }
+            //Session = SessionDocument.InstanceForWindowControllers?.Session;
+            //if (Session == null) {
+            //    Log.Error (TAG, "Unable to get ClientSession from SessionDocument");
+            //    throw new InvalidOperationException ();
+            //}
 
-            var viewControllers = new MacClientSessionViewControllers (this);
-            Session.InitializeViewControllers (viewControllers);
+            //var viewControllers = new MacClientSessionViewControllers (this);
+            //Session.InitializeViewControllers (viewControllers);
 
             ShouldCascadeWindows = false;
             Window.FrameAutosaveName = "SessionWindow";
@@ -52,7 +52,7 @@ namespace Xamarin.Interactive.Client.Mac
                 AllowsUserCustomization = false
             };
 
-            new SessionToolbarDelegate (Session, viewControllers, toolbar);
+            //new SessionToolbarDelegate (Session, viewControllers, toolbar);
 
             Window.Toolbar = toolbar;
 
@@ -93,12 +93,12 @@ namespace Xamarin.Interactive.Client.Mac
         void TerminateAgent (NSObject sender)
         {
             #if DEBUG
-            Session.TerminateAgentConnection ();
+            //Session.TerminateAgentConnection ();
             #endif
         }
 
         [Export ("clearHistory:")]
-        void ClearHistory (NSObject sender) => Session.ViewControllers.ReplHistory?.Clear ();
+        void ClearHistory (NSObject sender){}//Session.ViewControllers.ReplHistory?.Clear ();
 
         #endregion
     }
