@@ -12,7 +12,7 @@
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
     <AssemblyName>Xamarin Workbooks</AssemblyName>
     <UseXamMacFullFramework>True</UseXamMacFullFramework>
-    <MacOSXSdkVersion>10.10</MacOSXSdkVersion>
+    <MacOSXSdkVersion>10.12</MacOSXSdkVersion>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,7 +34,7 @@
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <UseRefCounting>false</UseRefCounting>
     <XamMacArch>x86_64</XamMacArch>
-    <MonoBundlingExtraArgs>--registrar:static --minos=10.10 --nowarn=2006,2013</MonoBundlingExtraArgs>
+    <MonoBundlingExtraArgs>--registrar:static --minos=10.12 --nowarn=2006,2013</MonoBundlingExtraArgs>
     <Profiling>false</Profiling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n>west</I18n>
@@ -58,7 +58,7 @@
     <XamMacArch>x86_64</XamMacArch>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <DefineConstants>__UNIFIED__;__MACOS__;MAC;MONOMAC;XAMCORE_2_0</DefineConstants>
-    <MonoBundlingExtraArgs>--registrar:static --minos=10.10 --nowarn=2006,2013</MonoBundlingExtraArgs>
+    <MonoBundlingExtraArgs>--registrar:static --minos=10.12 --nowarn=2006,2013</MonoBundlingExtraArgs>
     <Profiling>false</Profiling>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n>west</I18n>
@@ -122,44 +122,25 @@
     <Compile Include="AboutWindowController.designer.cs">
       <DependentUpon>AboutWindowController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Highlighter.cs" />
-    <Compile Include="NewWorkbookWindow.cs" />
     <Compile Include="NewWorkbookWindow.designer.cs">
       <DependentUpon>NewWorkbookWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="NewWorkbookCollectionView.cs" />
     <Compile Include="NewWorkbookCollectionView.designer.cs">
       <DependentUpon>NewWorkbookCollectionView.cs</DependentUpon>
     </Compile>
     <Compile Include="AutoFitTextField.cs" />
-    <Compile Include="PackageManagerWindow.cs" />
     <Compile Include="PackageManagerWindow.designer.cs">
       <DependentUpon>PackageManagerWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="PackageManagerWindowController.cs" />
     <Compile Include="PackageManagerWindowController.designer.cs">
       <DependentUpon>PackageManagerWindowController.cs</DependentUpon>
     </Compile>
-    <Compile Include="PackageAddWindow.cs" />
     <Compile Include="PackageAddWindow.designer.cs">
       <DependentUpon>PackageAddWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="PackageAddWindowController.cs" />
     <Compile Include="PackageAddWindowController.designer.cs">
       <DependentUpon>PackageAddWindowController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Roslyn\RoslynWorkspaceExplorerWindow.cs" />
-    <Compile Include="Roslyn\RoslynWorkspaceExplorerWindow.designer.cs">
-      <DependentUpon>Roslyn\RoslynWorkspaceExplorerWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Roslyn\RoslynWorkspaceExplorerWindowController.cs" />
-    <Compile Include="Roslyn\RoslynWorkspaceExplorerWindowController.designer.cs">
-      <DependentUpon>Roslyn\RoslynWorkspaceExplorerWindowController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Roslyn\RoslynWorkspaceOutlineViewDataSource.cs" />
-    <Compile Include="Roslyn\RoslynWorkspaceOutlineViewDelegate.cs" />
-    <Compile Include="Roslyn\RoslynSyntaxOutlineViewDataSource.cs" />
-    <Compile Include="Roslyn\RoslynSyntaxOutlineViewDelegate.cs" />
     <Compile Include="SessionWindow.cs" />
     <Compile Include="SessionWindow.designer.cs">
       <DependentUpon>SessionWindow.cs</DependentUpon>
@@ -172,39 +153,23 @@
     <Compile Include="WorkbookViewController.designer.cs">
       <DependentUpon>WorkbookViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="ViewHierarchyViewController.cs" />
     <Compile Include="ViewHierarchyViewController.designer.cs">
       <DependentUpon>ViewHierarchyViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="SessionDocument.cs" />
     <Compile Include="SessionViewController.cs" />
     <Compile Include="SessionDocumentController.cs" />
-    <Compile Include="VisualRepViewController.cs" />
-    <Compile Include="VisualRepViewController.designer.cs">
-      <DependentUpon>VisualRepViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ViewPropertyViewController.cs" />
-    <Compile Include="ViewPropertyViewController.designer.cs">
-      <DependentUpon>ViewPropertyViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ViewInspectorMainViewController.cs" />
     <Compile Include="ViewInspectorMainViewController.designer.cs">
       <DependentUpon>ViewInspectorMainViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="SessionViewControllerAdapter.cs" />
     <Compile Include="UserPresentableExceptionHandler.cs" />
-    <Compile Include="NewWorkbookViewController.cs" />
     <Compile Include="NewWorkbookViewController.designer.cs">
       <DependentUpon>NewWorkbookViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="ViewInspectorViewController.cs" />
     <Compile Include="ConnectToAgentViewController.cs" />
     <Compile Include="ConnectToAgentViewController.designer.cs">
       <DependentUpon>ConnectToAgentViewController.cs</DependentUpon>
-    </Compile>
-    <Compile Include="StatusToolbarViewController.cs" />
-    <Compile Include="StatusToolbarViewController.designer.cs">
-      <DependentUpon>StatusToolbarViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="StatusToolbarView.cs" />
     <Compile Include="StatusToolbarView.designer.cs">
@@ -219,7 +184,6 @@
     <Compile Include="SessionWindowTabViewController.designer.cs">
       <DependentUpon>SessionWindowTabViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="WorkbookTargetSelector.cs" />
     <Compile Include="Menu\XIEditorMenuItem.cs" />
     <Compile Include="Menu\MenuManager.cs" />
     <Compile Include="Menu\XIDebugMenuItem.cs" />
@@ -293,7 +257,6 @@
     <Compile Include="WebKit\WebKit\WebUIDelegatePrivate.g.cs" />
     <Compile Include="WebKit\WebKit\WebViewPrivate.g.cs" />
     <Compile Include="WebKit\WebKit\WebPreferencesPrivate.g.cs" />
-    <Compile Include="NewWorkbookPrimaryChoiceItem.cs" />
     <Compile Include="NewWorkbookPrimaryChoiceItem.designer.cs">
       <DependentUpon>NewWorkbookPrimaryChoiceItem.cs</DependentUpon>
     </Compile>
@@ -310,7 +273,6 @@
     <Compile Include="SystemInformation\VisualStudioForMacComponent.cs" />
     <Compile Include="Preferences\WebKitPrefs.cs" />
     <Compile Include="MacClientApp.cs" />
-    <Compile Include="MacViewInspector.cs" />
     <Compile Include="System\Windows\Input\MacRoutedCommandFactory.cs" />
     <Compile Include="System\Windows\Input\InputGesture.cs" />
     <Compile Include="System\Windows\Input\InputGestureCollection.cs" />
@@ -322,9 +284,6 @@
   <ItemGroup>
     <InterfaceDefinition Include="LogWindow.xib" />
     <InterfaceDefinition Include="AboutWindow.xib" />
-    <InterfaceDefinition Include="PackageManagerWindow.xib" />
-    <InterfaceDefinition Include="PackageAddWindow.xib" />
-    <InterfaceDefinition Include="Roslyn\RoslynWorkspaceExplorerWindow.xib" />
     <InterfaceDefinition Include="Main.storyboard" />
     <InterfaceDefinition Include="Updater.storyboard" />
     <InterfaceDefinition Include="NewWorkbookPrimaryChoiceItem.xib" />
@@ -341,6 +300,47 @@
     <None Include="ViewInspector\SceneKitDolly.cs" />
     <None Include="MacClientSessionViewControllers.cs" />
     <None Include="SessionToolbarDelegate.cs" />
+    <None Include="VisualRepViewController.cs" />
+    <None Include="ViewPropertyViewController.cs" />
+    <None Include="MacViewInspector.cs" />
+    <None Include="NewWorkbookCollectionView.cs" />
+    <None Include="NewWorkbookPrimaryChoiceItem.cs" />
+    <None Include="NewWorkbookWindow.cs" />
+    <None Include="NewWorkbookViewController.cs" />
+    <None Include="ViewHierarchyViewController.cs" />
+    <None Include="ViewInspectorMainViewController.cs" />
+    <None Include="ViewInspectorViewController.cs" />
+    <None Include="ViewPropertyViewController.designer.cs">
+      <DependentUpon>ViewPropertyViewController.cs</DependentUpon>
+    </None>
+    <None Include="VisualRepViewController.designer.cs">
+      <DependentUpon>VisualRepViewController.cs</DependentUpon>
+    </None>
+    <None Include="Highlighter.cs" />
+    <None Include="PackageManagerWindow.cs" />
+    <None Include="PackageManagerWindowController.cs" />
+    <None Include="PackageAddWindow.cs" />
+    <None Include="PackageAddWindowController.cs" />
+    <None Include="PackageManagerWindow.xib" />
+    <None Include="PackageAddWindow.xib" />
+    <None Include="StatusToolbarViewController.cs" />
+    <None Include="StatusToolbarViewController.designer.cs">
+      <DependentUpon>StatusToolbarViewController.cs</DependentUpon>
+    </None>
+    <None Include="WorkbookTargetSelector.cs" />
+    <None Include="Roslyn\RoslynWorkspaceExplorerWindow.cs" />
+    <None Include="Roslyn\RoslynWorkspaceExplorerWindowController.cs" />
+    <None Include="Roslyn\RoslynWorkspaceOutlineViewDataSource.cs" />
+    <None Include="Roslyn\RoslynWorkspaceOutlineViewDelegate.cs" />
+    <None Include="Roslyn\RoslynSyntaxOutlineViewDataSource.cs" />
+    <None Include="Roslyn\RoslynSyntaxOutlineViewDelegate.cs" />
+    <None Include="Roslyn\RoslynWorkspaceExplorerWindow.xib" />
+    <None Include="Roslyn\RoslynWorkspaceExplorerWindow.designer.cs">
+      <DependentUpon>Roslyn\RoslynWorkspaceExplorerWindow.cs</DependentUpon>
+    </None>
+    <None Include="Roslyn\RoslynWorkspaceExplorerWindowController.designer.cs">
+      <DependentUpon>Roslyn\RoslynWorkspaceExplorerWindowController.cs</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\ToolbarConsoleTemplate.pdf" />
@@ -394,14 +394,6 @@
     <ProjectReference Include="..\..\Agents\Xamarin.Interactive\Xamarin.Interactive.csproj">
       <Project>{4737FF0B-723F-50AE-9DDE-A670AEDA9B29}</Project>
       <Name>Xamarin.Interactive</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Xamarin.PropertyEditing\Xamarin.PropertyEditing\Xamarin.PropertyEditing.csproj">
-      <Project>{A0B6FE73-D046-4E1C-BA9D-F20683889C5A}</Project>
-      <Name>Xamarin.PropertyEditing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Xamarin.PropertyEditing\Xamarin.PropertyEditing.Mac\Xamarin.PropertyEditing.Mac.csproj">
-      <Project>{E8F4F0EB-C2B1-4116-8459-E076E0E0E485}</Project>
-      <Name>Xamarin.PropertyEditing.Mac</Name>
     </ProjectReference>
     <ProjectReference Include="..\Xamarin.Interactive.Client\Xamarin.Interactive.Client.csproj">
       <Project>{77494A40-61B7-59F7-B726-04430607B731}</Project>

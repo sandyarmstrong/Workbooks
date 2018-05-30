@@ -15,15 +15,15 @@ using Xamarin.Interactive.I18N;
 namespace Xamarin.Interactive.Client.Mac
 {
     partial class SessionWindowTabViewController
-        : NSTabViewController, IObserver<ClientSessionEvent>, INSMenuValidation
+        : NSTabViewController, /*IObserver<ClientSessionEvent>,*/ INSMenuValidation
     {
         readonly SessionViewControllerAdapter<SessionWindowTabViewController> sessionEventAdapter;
 
         public NSSegmentedControl ToolbarSegmentedControl { get; }
-        public ClientSession Session => sessionEventAdapter.Session;
+        //public ClientSession Session => sessionEventAdapter.Session;
 
         WorkbookViewController workbookViewController;
-        ViewInspectorMainViewController viewInspectorViewController;
+        //ViewInspectorMainViewController viewInspectorViewController;
 
         SessionWindowTabViewController (IntPtr handle) : base (handle)
         {
@@ -46,8 +46,8 @@ namespace Xamarin.Interactive.Client.Mac
             workbookViewController = (WorkbookViewController)storyboard
                 .InstantiateControllerWithIdentifier (nameof (WorkbookViewController));
 
-            viewInspectorViewController = (ViewInspectorMainViewController)storyboard
-                .InstantiateControllerWithIdentifier (nameof (ViewInspectorMainViewController));
+            //viewInspectorViewController = (ViewInspectorMainViewController)storyboard
+                //.InstantiateControllerWithIdentifier (nameof (ViewInspectorMainViewController));
 
             AddChildViewController (workbookViewController);
 
@@ -125,20 +125,20 @@ namespace Xamarin.Interactive.Client.Mac
 
             if (viewController is WorkbookViewController) {
                 item.Image = NSImage.ImageNamed ("ToolbarConsoleTemplate");
-                if (Session != null) {
-                    if (Session.SessionKind == ClientSessionKind.Workbook) {
-                        item.Label = Catalog.GetString ("Workbook");
-                        item.ToolTip = Catalog.GetString ("Show the workbook view");
-                    } else {
-                        item.Label = Catalog.GetString ("REPL");
-                        item.ToolTip = Catalog.GetString ("Show the REPL view");
-                    }
-                }
-            } else if (viewController is ViewInspectorMainViewController) {
+                //if (Session != null) {
+                //    if (Session.SessionKind == ClientSessionKind.Workbook) {
+                //        item.Label = Catalog.GetString ("Workbook");
+                //        item.ToolTip = Catalog.GetString ("Show the workbook view");
+                //    } else {
+                //        item.Label = Catalog.GetString ("REPL");
+                //        item.ToolTip = Catalog.GetString ("Show the REPL view");
+                //    }
+                //}
+            } /*else if (viewController is ViewInspectorMainViewController) {
                 item.Image = NSImage.ImageNamed ("ToolbarHierarchyTemplate");
                 item.Label = Catalog.GetString ("View Inspector");
                 item.ToolTip = Catalog.GetString ("Show the view inspector");
-            }
+            }*/
 
             return item;
         }
@@ -258,36 +258,36 @@ namespace Xamarin.Interactive.Client.Mac
 
         #region IObserver<ClientSessionEvent>
 
-        void OnAgentFeaturesUpdated ()
-        {
-            var supportsViewInspection = sessionEventAdapter
-                .Session
-                .Agent
-                .Features?
-                .SupportedViewInspectionHierarchies?
-                .Count > 0;
+        //void OnAgentFeaturesUpdated ()
+        //{
+        //    var supportsViewInspection = sessionEventAdapter
+        //        .Session
+        //        .Agent
+        //        .Features?
+        //        .SupportedViewInspectionHierarchies?
+        //        .Count > 0;
 
-            var viewInspectionTab = GetTabViewItem (viewInspectorViewController);
+        //    var viewInspectionTab = GetTabViewItem (viewInspectorViewController);
 
-            if (supportsViewInspection && viewInspectionTab == null)
-                AddChildViewController (viewInspectorViewController);
-            else if (!supportsViewInspection && viewInspectionTab != null)
-                RemoveChildViewController (TabView.IndexOf (viewInspectionTab));
-        }
+        //    if (supportsViewInspection && viewInspectionTab == null)
+        //        AddChildViewController (viewInspectorViewController);
+        //    else if (!supportsViewInspection && viewInspectionTab != null)
+        //        RemoveChildViewController (TabView.IndexOf (viewInspectionTab));
+        //}
 
-        void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent evnt)
-        {
-            if (evnt.Kind == ClientSessionEventKind.AgentFeaturesUpdated)
-                OnAgentFeaturesUpdated ();
-        }
+        //void IObserver<ClientSessionEvent>.OnNext (ClientSessionEvent evnt)
+        //{
+        //    if (evnt.Kind == ClientSessionEventKind.AgentFeaturesUpdated)
+        //        OnAgentFeaturesUpdated ();
+        //}
 
-        void IObserver<ClientSessionEvent>.OnError (Exception error)
-        {
-        }
+        //void IObserver<ClientSessionEvent>.OnError (Exception error)
+        //{
+        //}
 
-        void IObserver<ClientSessionEvent>.OnCompleted ()
-        {
-        }
+        //void IObserver<ClientSessionEvent>.OnCompleted ()
+        //{
+        //}
 
         #endregion
     }

@@ -20,7 +20,7 @@ using Xamarin.Interactive.I18N;
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.Preferences;
 using Xamarin.Interactive.Client.Mac.Menu;
-using Xamarin.Interactive.Client.Mac.Roslyn;
+//using Xamarin.Interactive.Client.Mac.Roslyn;
 using Xamarin.Interactive.Client.Updater;
 
 namespace Xamarin.Interactive.Client.Mac
@@ -353,15 +353,15 @@ namespace Xamarin.Interactive.Client.Mac
             connectToAgentWindowController.Window.MakeKeyAndOrderFront (sender);
         }
 
-        RoslynWorkspaceExplorerWindowController roslynWorkspaceExplorerWindowController;
+        //RoslynWorkspaceExplorerWindowController roslynWorkspaceExplorerWindowController;
 
-        [Export ("showRoslynWorkspaceExplorer:")]
-        void ShowRoslynWorkspaceExplorer (NSObject sender)
-        {
-            if (roslynWorkspaceExplorerWindowController == null)
-                roslynWorkspaceExplorerWindowController = new RoslynWorkspaceExplorerWindowController ();
-            roslynWorkspaceExplorerWindowController.Window.MakeKeyAndOrderFront (sender);
-        }
+        //[Export ("showRoslynWorkspaceExplorer:")]
+        //void ShowRoslynWorkspaceExplorer (NSObject sender)
+        //{
+        //    if (roslynWorkspaceExplorerWindowController == null)
+        //        roslynWorkspaceExplorerWindowController = new RoslynWorkspaceExplorerWindowController ();
+        //    roslynWorkspaceExplorerWindowController.Window.MakeKeyAndOrderFront (sender);
+        //}
 
         #endregion
     }

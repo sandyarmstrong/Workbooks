@@ -17,43 +17,43 @@ namespace Xamarin.Interactive.Client.Mac
 {
     sealed partial class WorkbookOutlineViewController : SessionViewController
     {
-        WorkbookOutlineViewDelegate outlineViewDelegate;
-        CollectionOutlineViewDataSource outlineViewDataSource;
+        //WorkbookOutlineViewDelegate outlineViewDelegate;
+        //CollectionOutlineViewDataSource outlineViewDataSource;
 
         WorkbookOutlineViewController (IntPtr handle) : base (handle)
         {
         }
 
-        protected override void OnSessionAvailable ()
-        {
-            outlineView.RowSizeStyle = NSTableViewRowSizeStyle.Medium;
+        //protected override void OnSessionAvailable ()
+        //{
+        //    outlineView.RowSizeStyle = NSTableViewRowSizeStyle.Medium;
 
-            outlineViewDataSource = new CollectionOutlineViewDataSource (Session.Workbook.TreeNode);
-            outlineViewDataSource.Reload += (sender, e) => {
-                var selectedNode = outlineView.SelectedNode;
+        //    outlineViewDataSource = new CollectionOutlineViewDataSource (Session.Workbook.TreeNode);
+        //    outlineViewDataSource.Reload += (sender, e) => {
+        //        var selectedNode = outlineView.SelectedNode;
 
-                if (e.Item == null)
-                    outlineView.ReloadData ();
-                else
-                    outlineView.ReloadItem (e.Item, e.ReloadChildren);
+        //        if (e.Item == null)
+        //            outlineView.ReloadData ();
+        //        else
+        //            outlineView.ReloadItem (e.Item, e.ReloadChildren);
 
-                if (selectedNode != null)
-                    outlineView.SelectedNode = selectedNode;
-            };
+        //        if (selectedNode != null)
+        //            outlineView.SelectedNode = selectedNode;
+        //    };
 
-            outlineView.DataSource = outlineViewDataSource;
-            outlineView.ReloadData ();
+        //    outlineView.DataSource = outlineViewDataSource;
+        //    outlineView.ReloadData ();
 
-            outlineViewDelegate = new WorkbookOutlineViewDelegate (outlineView);
-            outlineViewDelegate.NavigateTableOfContents += toc =>
-                ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (toc.Id);
-            outlineView.Delegate = outlineViewDelegate;
-        }
+        //    outlineViewDelegate = new WorkbookOutlineViewDelegate (outlineView);
+        //    outlineViewDelegate.NavigateTableOfContents += toc =>
+        //        ((XcbWorkbookPageView)Session.EvaluationService).ScrollToElementWithId (toc.Id);
+        //    outlineView.Delegate = outlineViewDelegate;
+        //}
 
-        protected override void OnSessionTitleUpdated ()
-        {
-            outlineView.ReloadData ();
-        }
+        //protected override void OnSessionTitleUpdated ()
+        //{
+        //    outlineView.ReloadData ();
+        //}
 
         [Export ("addItem:")]
         void AddItem (NSObject sender)

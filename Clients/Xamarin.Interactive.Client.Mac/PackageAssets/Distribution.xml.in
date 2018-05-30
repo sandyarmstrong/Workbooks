@@ -5,9 +5,9 @@
   <installation-check script="check_requirements ();"/>
   <script><![CDATA[
 	function check_requirements () {
-		if (system.compareVersions (system.version.ProductVersion, '10.11.0') < 0) {
-			my.result.title = 'Mac OS X El Capitan required';
-			my.result.message = 'This version of the Xamarin Workbooks & Inspector requires Mac OS X El Capitan (10.11) or newer.';
+		if (system.compareVersions (system.version.ProductVersion, '10.12.0') < 0) {
+			my.result.title = 'Mac OS X Sierra required';
+			my.result.message = 'This version of the Xamarin Workbooks & Inspector requires Mac OS X Sierra (10.12) or newer.';
 			my.result.type = 'Fatal';
 			return false;
 		}

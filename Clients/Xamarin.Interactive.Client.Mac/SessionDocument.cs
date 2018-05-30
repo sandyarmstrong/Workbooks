@@ -160,7 +160,7 @@ namespace Xamarin.Interactive.Client.Mac
             return true;
         }
 
-        IWorkbookSaveOperation workbookSaveOperation;
+        //IWorkbookSaveOperation workbookSaveOperation;
 
         public override bool WriteSafelyToUrl (
             NSUrl url,
@@ -197,9 +197,9 @@ namespace Xamarin.Interactive.Client.Mac
         //        workbookSaveOperation = null;
         //    }
 
-        //    outError = null;
-        //    return true;
-        //}
+            outError = null;
+            return true;
+        }
 
         public override bool ShouldRunSavePanelWithAccessoryView => false;
 

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
-        <plugIn identifier="com.apple.SceneKitIBPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <plugIn identifier="com.apple.SceneKitIBPlugin" version="14109"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="14109"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
@@ -45,7 +46,7 @@
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" id="pP2-z6-X2x" customClass="NewWorkbookCollectionView">
                                             <rect key="frame" x="0.0" y="0.0" width="256" height="64"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" id="tel-rg-FdN">
                                                 <size key="itemSize" width="64" height="64"/>
                                             </collectionViewFlowLayout>
@@ -132,7 +133,7 @@ DQ
                                 </connections>
                             </button>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QV5-sT-FVn">
-                                <rect key="frame" x="110" y="218" width="224" height="24"/>
+                                <rect key="frame" x="110" y="218" width="217" height="24"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Create a new Workbook" id="K3V-WG-9VM">
                                     <font key="font" metaFont="systemMedium" size="20"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -219,7 +220,6 @@ Gw
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <font key="font" metaFont="message"/>
-                        <tabViewItems/>
                         <connections>
                             <outlet property="delegate" destination="XgF-AY-gyd" id="PpE-Ax-k3z"/>
                         </connections>
@@ -359,7 +359,7 @@ Gw
                                 </connections>
                             </button>
                             <button translatesAutoresizingMaskIntoConstraints="NO" id="MQR-nn-qjq">
-                                <rect key="frame" x="19" y="41" width="306" height="18"/>
+                                <rect key="frame" x="19" y="41" width="307" height="18"/>
                                 <buttonCell key="cell" type="radio" title="Yes, I am willing to participate (Recommended)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="mCV-Tw-6u2">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -1349,7 +1349,6 @@ Gw
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="650"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <font key="font" metaFont="message"/>
-                        <tabViewItems/>
                         <connections>
                             <outlet property="delegate" destination="Jup-za-gER" id="lRf-TV-n54"/>
                         </connections>
@@ -1361,6 +1360,34 @@ Gw
                 <customObject id="KeB-KZ-gAC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="882" y="412"/>
+        </scene>
+        <!--Workbook Modern Web View Controller-->
+        <scene sceneID="G4R-WC-0eh">
+            <objects>
+                <viewController id="pjo-0U-Opz" userLabel="Workbook Modern Web View Controller" sceneMemberID="viewController">
+                    <view key="view" id="xfL-XH-hSh">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PXa-aV-hqn">
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="PXa-aV-hqn" firstAttribute="top" secondItem="xfL-XH-hSh" secondAttribute="top" id="0ek-dF-IQh"/>
+                            <constraint firstItem="PXa-aV-hqn" firstAttribute="leading" secondItem="xfL-XH-hSh" secondAttribute="leading" id="H4w-o9-SN9"/>
+                            <constraint firstAttribute="trailing" secondItem="PXa-aV-hqn" secondAttribute="trailing" id="J2C-qG-i1Y"/>
+                            <constraint firstAttribute="bottom" secondItem="PXa-aV-hqn" secondAttribute="bottom" id="ber-ZR-vKE"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="Rib-yS-1L0" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="124" y="220"/>
         </scene>
         <!--Workbook View Controller-->
         <scene sceneID="tVJ-S2-mVM">
@@ -1438,7 +1465,7 @@ Gw
                                                     <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn width="197" minWidth="40" maxWidth="1000" id="65A-73-5ov">
+                                                        <tableColumn identifier="" width="197" minWidth="40" maxWidth="1000" id="65A-73-5ov">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1593,7 +1620,7 @@ Gw
                                         <rect key="frame" x="0.0" y="0.0" width="341" height="671"/>
                                         <beginningViews>
                                             <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hCg-5c-yxB">
-                                                <rect key="frame" x="108.5" y="648" width="124" height="24"/>
+                                                <rect key="frame" x="105" y="648" width="131" height="24"/>
                                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="6Ii-cw-Hfp">
                                                     <font key="font" metaFont="system"/>
                                                     <segments>
@@ -1620,7 +1647,7 @@ Gw
                                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                             <tableColumns>
-                                                                <tableColumn width="197" minWidth="40" maxWidth="1000" id="yvS-Gc-Kf1">
+                                                                <tableColumn identifier="" width="197" minWidth="40" maxWidth="1000" id="yvS-Gc-Kf1">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1638,7 +1665,7 @@ Gw
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
                                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iBj-xF-EbN">
-                                                                                    <rect key="frame" x="3" y="-1" width="16" height="16"/>
+                                                                                    <rect key="frame" x="3" y="0.0" width="14" height="14"/>
                                                                                     <constraints>
                                                                                         <constraint firstAttribute="height" relation="lessThanOrEqual" constant="16" id="3c9-kD-Pp1"/>
                                                                                         <constraint firstAttribute="width" relation="lessThanOrEqual" constant="16" id="duc-VV-gAq"/>
@@ -1646,7 +1673,7 @@ Gw
                                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="YFj-aE-Xut"/>
                                                                                 </imageView>
                                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2V-wJ-cKK">
-                                                                                    <rect key="frame" x="21" y="-1" width="178" height="17"/>
+                                                                                    <rect key="frame" x="19" y="-1" width="180" height="17"/>
                                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="tao-dz-rM9">
                                                                                         <font key="font" metaFont="system"/>
                                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1783,7 +1810,6 @@ Gw
         <image name="NSPreferencesGeneral" width="32" height="32"/>
         <image name="new-workbook-background" width="90" height="230"/>
         <image name="preferences-feedback-32" width="32" height="32"/>
-        <image name="preferences-updates-32" width="32" height="32"/>
         <image name="refresh-16" width="16" height="16"/>
     </resources>
 </document>

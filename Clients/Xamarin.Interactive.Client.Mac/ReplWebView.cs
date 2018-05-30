@@ -241,15 +241,15 @@ namespace Xamarin.Interactive.Client.Mac
             bool ScrollToElementWithId (WebView webView, string fragment)
             {
                 // scroll to fragment/IDs via JS
-                if (!string.IsNullOrEmpty (fragment)) {
-                    (((webView as ReplWebView)
-                        ?.Window
-                        ?.WindowController as SessionWindowController)
-                        ?.Session
-                        ?.EvaluationService as XcbWorkbookPageView)
-                        ?.ScrollToElementWithId (fragment);
-                    return true;
-                }
+                //if (!string.IsNullOrEmpty (fragment)) {
+                //    (((webView as ReplWebView)
+                //        ?.Window
+                //        ?.WindowController as SessionWindowController)
+                //        ?.Session
+                //        ?.EvaluationService as XcbWorkbookPageView)
+                //        ?.ScrollToElementWithId (fragment);
+                //    return true;
+                //}
 
                 return false;
             }

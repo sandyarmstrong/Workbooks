@@ -13,7 +13,7 @@ namespace Xamarin.Interactive.Client.Mac
 {
     sealed partial class WorkbookWebViewController : SessionViewController
     {
-        IWorkbookPageHost workbookPageViewHost;
+        //IWorkbookPageHost workbookPageViewHost;
 
         WorkbookWebViewController (IntPtr handle) : base (handle)
         {
@@ -33,12 +33,12 @@ namespace Xamarin.Interactive.Client.Mac
             webView.UnsubscribeFromPreferences ();
         }
 
-        protected override void OnSessionAvailable ()
-        {
-            if (workbookPageViewHost == null)
-                workbookPageViewHost = new WorkbookWebPageViewHost (webView.XcbWebView);
+        //protected override void OnSessionAvailable ()
+        //{
+        //    if (workbookPageViewHost == null)
+        //        workbookPageViewHost = new WorkbookWebPageViewHost (webView.XcbWebView);
 
-            Session.InitializeAsync (workbookPageViewHost).Forget ();
-        }
+        //    Session.InitializeAsync (workbookPageViewHost).Forget ();
+        //}
     }
 }
