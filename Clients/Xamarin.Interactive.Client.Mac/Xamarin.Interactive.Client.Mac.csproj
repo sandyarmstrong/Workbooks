@@ -387,10 +387,6 @@
   <Import Project="Build.targets" />
   <Import Project="Package.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\CrossBrowser\Xamarin.CrossBrowser.Mac\Xamarin.CrossBrowser.Mac.csproj">
-      <Project>{68B5F01B-6F1C-49D5-9491-96F826AFE211}</Project>
-      <Name>Xamarin.CrossBrowser.Mac</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Agents\Xamarin.Interactive\Xamarin.Interactive.csproj">
       <Project>{4737FF0B-723F-50AE-9DDE-A670AEDA9B29}</Project>
       <Name>Xamarin.Interactive</Name>

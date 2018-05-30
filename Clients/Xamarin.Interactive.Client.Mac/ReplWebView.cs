@@ -17,7 +17,7 @@ using AppKit;
 using ObjCRuntime;
 using WebKit;
 
-using Xamarin.CrossBrowser;
+//using Xamarin.CrossBrowser;
 
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.Preferences;
@@ -42,12 +42,12 @@ namespace Xamarin.Interactive.Client.Mac
         {
         }
 
-        public XcbWebView XcbWebView { get; private set; }
+        //public XcbWebView XcbWebView { get; private set; }
         public WebInspector WebInspector { get; private set; }
 
         public override void AwakeFromNib ()
         {
-            XcbWebView = new XcbWebView (this);
+            //XcbWebView = new XcbWebView (this);
 
             UIDelegate = new XIWebUIDelegate ();
             PolicyDelegate = new XIWebPolicyDelegate ();
