@@ -1364,7 +1364,7 @@ Gw
         <!--Workbook Modern Web View Controller-->
         <scene sceneID="G4R-WC-0eh">
             <objects>
-                <viewController id="pjo-0U-Opz" userLabel="Workbook Modern Web View Controller" sceneMemberID="viewController">
+                <viewController id="pjo-0U-Opz" storyboardIdentifier="WorkbookModernWebViewController" userLabel="Workbook Modern Web View Controller" customClass="WorkbookModernWebViewController" sceneMemberID="viewController">
                     <view key="view" id="xfL-XH-hSh">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1383,6 +1383,9 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="PXa-aV-hqn" secondAttribute="trailing" id="J2C-qG-i1Y"/>
                             <constraint firstAttribute="bottom" secondItem="PXa-aV-hqn" secondAttribute="bottom" id="ber-ZR-vKE"/>
                         </constraints>
+                    <connections>
+                        <outlet property="webView" destination="PXa-aV-hqn" id="gaj-8y-343"/>
+                    </connections>
                     </view>
                 </viewController>
                 <customObject id="Rib-yS-1L0" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

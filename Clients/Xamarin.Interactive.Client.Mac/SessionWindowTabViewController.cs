@@ -22,7 +22,8 @@ namespace Xamarin.Interactive.Client.Mac
         public NSSegmentedControl ToolbarSegmentedControl { get; }
         //public ClientSession Session => sessionEventAdapter.Session;
 
-        WorkbookViewController workbookViewController;
+        WorkbookModernWebViewController workbookModernWebViewController;
+        //WorkbookViewController workbookViewController;
         //ViewInspectorMainViewController viewInspectorViewController;
 
         SessionWindowTabViewController (IntPtr handle) : base (handle)
@@ -43,13 +44,16 @@ namespace Xamarin.Interactive.Client.Mac
         {
             var storyboard = NSStoryboard.FromName ("Main", NSBundle.MainBundle);
 
-            workbookViewController = (WorkbookViewController)storyboard
-                .InstantiateControllerWithIdentifier (nameof (WorkbookViewController));
+            workbookModernWebViewController = (WorkbookModernWebViewController)storyboard
+                .InstantiateControllerWithIdentifier (nameof (WorkbookModernWebViewController));
+
+            //workbookViewController = (WorkbookViewController)storyboard
+                //.InstantiateControllerWithIdentifier (nameof (WorkbookViewController));
 
             //viewInspectorViewController = (ViewInspectorMainViewController)storyboard
                 //.InstantiateControllerWithIdentifier (nameof (ViewInspectorMainViewController));
 
-            AddChildViewController (workbookViewController);
+            AddChildViewController (workbookModernWebViewController);
 
             SelectedTabViewItemIndex = 0;
             ToolbarSegmentedControl.SelectedSegment = 0;

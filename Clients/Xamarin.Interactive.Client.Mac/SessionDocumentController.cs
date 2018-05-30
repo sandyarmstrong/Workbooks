@@ -45,7 +45,10 @@ namespace Xamarin.Interactive.Client.Mac
 
         public void OpenUntitledDocument (AgentType? agentType = null)
         {
-            // TODO!!!
+            Log.Debug (TAG, "OpenUntitledDocument");
+            OpenDocument (new ClientSessionUri (
+                AgentType.DotNetCore,
+                ClientSessionKind.Workbook));
 
             //var keyWindow = NSApplication.SharedApplication.KeyWindow;
             //if (keyWindow is NewWorkbookWindow)
@@ -93,6 +96,7 @@ namespace Xamarin.Interactive.Client.Mac
 
         public override NSObject OpenDocument (NSUrl url, bool displayDocument, out NSError outError)
         {
+            Log.Debug (TAG, "OpenDocument");
             outError = AppDelegate.SuppressionNSError;
 
             if (CommandLineTool.TestDriver.ShouldRun)
@@ -123,7 +127,9 @@ namespace Xamarin.Interactive.Client.Mac
                     throw new NSErrorException (outError);
 
                 //if (document != null)
-                    //clientSessionController.AddSession (document.Session, document);
+                //clientSessionController.AddSession (document.Session, document);
+
+                document.MakeKeyAndOrderFront (this);
 
                 return document;
             } catch (Exception e) {

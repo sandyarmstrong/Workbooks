@@ -269,6 +269,9 @@
     <Compile Include="..\..\Agents\Xamarin.Interactive.Mac\NativeExceptionHandler.cs">
       <Link>NativeExceptionHandler.cs</Link>
     </Compile>
+    <Compile Include="..\Xamarin.Interactive.Client.Windows\ClientServerService.cs">
+      <Link>ClientServerService.cs</Link>
+    </Compile>
     <Compile Include="Xamarin.Mac\StoryboardExtensions.cs" />
     <Compile Include="SystemInformation\VisualStudioForMacComponent.cs" />
     <Compile Include="Preferences\WebKitPrefs.cs" />
@@ -280,6 +283,10 @@
     <Compile Include="System\Windows\Input\RoutedCommand.cs" />
     <Compile Include="System\Windows\Input\RoutedUICommand.cs" />
     <Compile Include="System\Windows\Input\RoutedUICommandMenuItem.cs" />
+    <Compile Include="WorkbookModernWebViewController.cs" />
+    <Compile Include="WorkbookModernWebViewController.designer.cs">
+      <DependentUpon>WorkbookModernWebViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LogWindow.xib" />

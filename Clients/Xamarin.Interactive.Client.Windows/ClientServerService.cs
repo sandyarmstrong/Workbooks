@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Xamarin.Interactive.Core;
 using Xamarin.ProcessControl;
 
-namespace Xamarin.Interactive.Client.Windows
+namespace Xamarin.Interactive.Client
 {
     class ClientServerService
     {
