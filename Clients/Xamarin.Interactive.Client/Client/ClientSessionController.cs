@@ -70,7 +70,8 @@ namespace Xamarin.Interactive.Client
                 switch (state.Session.SessionKind) {
                 case ClientSessionKind.Workbook:
                     if (clientSessionUri.WorkbookPath != null &&
-                        state.Session.Workbook.LogicalPath == clientSessionUri.WorkbookPath) {
+                        //state.Session.Workbook.LogicalPath == clientSessionUri.WorkbookPath) {
+                        state.Session.Uri.WorkbookPath == clientSessionUri.WorkbookPath) {
                         applicationState = state.ApplicationState;
                         return true;
                     }

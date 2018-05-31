@@ -106,7 +106,9 @@ export class WorkbookSession {
         await this.hubConnection.start()
 
         this._availableWorkbookTargets = <WorkbookTarget[]>await this.hubConnection.invoke(
-            'GetAvailableWorkbookTargets')
+            'GetAvailableWorkbookTargets');
+
+        (window as any).webkit.messageHandlers.workbooks.postMessage(JSON.stringify(this._availableWorkbookTargets));
 
         // Mono WASM crashes Safari so hard that even when loaded in an iframe, as we do,
         // the entire page crashes (the parent page, the frame, everything)—it looks like

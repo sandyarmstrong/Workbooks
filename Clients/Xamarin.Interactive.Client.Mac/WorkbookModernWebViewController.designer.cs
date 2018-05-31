@@ -3,10 +3,8 @@ using WebKit;
 
 namespace Xamarin.Interactive.Client.Mac
 {
-
-    // Should subclass AppKit.NSView
     [Register ("WorkbookModernWebViewController")]
-    public partial class WorkbookModernWebViewController
+    partial class WorkbookModernWebViewController
     {
         [Outlet]
         WKWebView webView { get; set; }

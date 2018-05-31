@@ -38,9 +38,6 @@ namespace Xamarin.Interactive.Client
         {
             var tcs = new TaskCompletionSource<Uri> ();
 
-            // TODO: Add to InteractiveInstallation
-            FilePath serverAssembly = @"C:\Users\sandy\xam-git\workbooks\Clients\Xamarin.Interactive.Client.Web\bin\Debug\netcoreapp2.0\workbooks-server.dll";
-
             Uri clientServerUri = null;
             var clientServerLaunched = false;
 
@@ -77,6 +74,11 @@ namespace Xamarin.Interactive.Client
                 if (clientServerLaunched)
                     tcs.TrySetResult (clientServerUri);
             }
+
+            // TODO: Add to InteractiveInstallation
+            FilePath serverAssembly =
+                //@"C:\Users\sandy\xam-git\workbooks\Clients\Xamarin.Interactive.Client.Web\bin\Debug\netcoreapp2.0\workbooks-server.dll";
+                "/Users/sandy/xam-git/workbooks/Clients/Xamarin.Interactive.Client.Web/bin/Debug/netcoreapp2.0/workbooks-server.dll";
 
             // TODO: Support launching packaged server
             var exec = new Exec (

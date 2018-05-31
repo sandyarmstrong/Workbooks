@@ -9,9 +9,6 @@
     <Import_RootNamespace>Xamarin.Interactive</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Client\ClientSession.cs" />
-    <Compile Remove="Client\ClientSessionController.cs" />
-    <Compile Remove="Client\ClientSessionEvent.cs" />
     <Compile Remove="Client\IClientSessionViewControllers.cs" />
     <Compile Remove="Client\ViewControllers\NewWorkbookItem.cs" />
     <Compile Remove="Client\ViewControllers\NewWorkbookViewController.cs" />
