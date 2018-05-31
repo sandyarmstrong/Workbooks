@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -20,8 +20,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
@@ -34,8 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
@@ -68,11 +64,11 @@
       <Name>Xamarin.Interactive.iOS</Name>
     </ProjectReference>
     <ProjectReference Include="..\Xamarin.Interactive\Xamarin.Interactive.csproj">
-      <Project>{955F473A-04EC-4716-B75E-509BA892499B}</Project>
+      <Project>{4737FF0B-723F-50AE-9DDE-A670AEDA9B29}</Project>
       <Name>Xamarin.Interactive</Name>
     </ProjectReference>
     <ProjectReference Include="..\Xamarin.Interactive.Forms\Xamarin.Interactive.Forms.csproj">
-      <Project>{932D2C61-5DBE-4D82-A4D6-1EA7401F10D3}</Project>
+      <Project>{19102371-2B93-523D-A686-88895EC40E4F}</Project>
       <Name>Xamarin.Interactive.Forms</Name>
     </ProjectReference>
   </ItemGroup>

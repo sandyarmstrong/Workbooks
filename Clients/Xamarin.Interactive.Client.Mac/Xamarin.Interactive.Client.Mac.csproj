@@ -40,6 +40,7 @@
     <I18n>west</I18n>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
     <NoWarn>1702</NoWarn>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -63,6 +64,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <I18n>west</I18n>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Xamarin.Mac" />
@@ -286,6 +288,18 @@
     <Compile Include="WorkbookModernWebViewController.cs" />
     <Compile Include="WorkbookModernWebViewController.designer.cs">
       <DependentUpon>WorkbookModernWebViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusToolbarViewImageView.cs" />
+    <Compile Include="StatusToolbarViewImageView.designer.cs">
+      <DependentUpon>StatusToolbarViewImageView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusToolbarViewProgressIndicator.cs" />
+    <Compile Include="StatusToolbarViewProgressIndicator.designer.cs">
+      <DependentUpon>StatusToolbarViewProgressIndicator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyEditorPanel.cs" />
+    <Compile Include="PropertyEditorPanel.designer.cs">
+      <DependentUpon>PropertyEditorPanel.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
