@@ -45,12 +45,12 @@ namespace Xamarin.Interactive.Client
     {
         public string FileName { get; }
 
-        public string WorkbookContents { get; }
+        public string Contents { get; }
 
         public LoadWorkbookData (string fileName, string workbookContents)
         {
             FileName = fileName;
-            WorkbookContents = workbookContents;
+            Contents = workbookContents;
         }
     }
 

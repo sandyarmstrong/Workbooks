@@ -107,7 +107,7 @@ namespace Xamarin.Interactive.Client.Mac
         //    //(InteractivePackage)node.RepresentedObject);
         //}
 
-#endregion
+        #endregion
     }
 
     class ScriptMessageHandler : WKScriptMessageHandler
@@ -129,8 +129,13 @@ namespace Xamarin.Interactive.Client.Mac
                 }
             }
 
+            // TODO: Change this whole thing so we can support archives/packages. Need to provide
+            //       an HTTP API that JS can hit to get the workbook file.
             if ((message.Body as NSString) == "sessionReady") {
-                var path = "/Users/sandy/Documents/workbooks/mcc.workbook";
+                var path = controller.Session.Uri.WorkbookPath;
+                if (path == null) // new workbook I guess
+                    return;
+
                 controller.Session.PostAction (new LoadWorkbookAction (
                     controller.Session,
                     path,

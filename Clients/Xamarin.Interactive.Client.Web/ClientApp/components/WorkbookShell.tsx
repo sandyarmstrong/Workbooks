@@ -86,6 +86,8 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
         } else if (userAction.kind == UserActionKind.LoadWorkbook) {
             let data = userAction.data as LoadWorkbookData
             this.loadWorkbookContent(data.fileName, data.contents) // TODO: any reason to await?
+        } else if (userAction.kind == UserActionKind.RunAll) {
+            this.evaluateWorkbook()
         }
     }
 
