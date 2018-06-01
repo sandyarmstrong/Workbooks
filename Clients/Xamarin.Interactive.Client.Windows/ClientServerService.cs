@@ -6,6 +6,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -91,7 +92,10 @@ namespace Xamarin.Interactive.Client
                     }),
                 ExecFlags.RedirectStdout | ExecFlags.RedirectStderr,
                 HandleOutput,
-                workingDirectory: serverAssembly.ParentDirectory.ParentDirectory.ParentDirectory.ParentDirectory);
+                workingDirectory: serverAssembly.ParentDirectory.ParentDirectory.ParentDirectory.ParentDirectory,
+                environmentVariables: new Dictionary<string, string> {
+                    { "ASPNETCORE_ENVIRONMENT", "Development" },
+                });
             exec.RunAsync ().Forget ();
 
             return tcs.Task;

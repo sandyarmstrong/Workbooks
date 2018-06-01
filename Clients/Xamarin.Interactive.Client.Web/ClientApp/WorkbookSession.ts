@@ -12,7 +12,8 @@ import { resolveJsonReferences } from './utils/JsonRefs'
 import { isSafari } from "./utils"
 import { CodeCellResult, CapturedOutputSegment, ICodeCellEvent, CodeCellUpdate, CodeCellEventType } from './evaluation'
 import { Message, StatusUIAction, StatusUIActionWithMessage, MessageKind, MessageSeverity } from './messages'
-import { WebAssemblyAgentContainer } from './WebAssemblyAgentContainer';
+import { WebAssemblyAgentContainer } from './WebAssemblyAgentContainer'
+import { xiexports } from "./xiexports"
 
 export type SdkId = string
 
@@ -53,6 +54,23 @@ export const enum SessionEventKind {
     Evaluation = 'Evaluation'
 }
 
+export const enum UserActionKind {
+    AddPackages = 'AddPackages',
+    RunAll = 'RunAll',
+    LoadWorkbook = 'LoadWorkbook',
+    SaveWorkbook = 'SaveWorkbook'
+}
+
+export interface LoadWorkbookData {
+    fileName: string
+    contents: string
+}
+
+export interface UserAction {
+    kind: UserActionKind
+    data?: any
+}
+
 export interface SessionEvent {
     kind: SessionEventKind
     data?: any
@@ -72,6 +90,10 @@ export interface PackageDescription {
 
 const wasmWorkbookId: string = "webassembly-monowebassembly"
 
+xiexports.sendAction = (action: UserAction) => {
+    WorkbookSession.currentSession.nativeUserActionEvent.dispatch(action)
+}
+
 export class WorkbookSession {
     private hubConnection = new HubConnection('/session')
     private wasmContainer: WebAssemblyAgentContainer | null = null
@@ -79,6 +101,7 @@ export class WorkbookSession {
     readonly sessionEvent: Event<WorkbookSession, SessionEvent>
     readonly statusUIActionEvent: Event<WorkbookSession, StatusUIActionWithMessage>
     readonly codeCellEvent: Event<WorkbookSession, ICodeCellEvent>
+    readonly nativeUserActionEvent: Event<WorkbookSession, UserAction>
 
     private _availableWorkbookTargets: WorkbookTarget[] = []
     get availableWorkbookTargets() {
@@ -89,13 +112,18 @@ export class WorkbookSession {
         return new Promise(res => setTimeout(res, ms))
     }
 
+    static currentSession: WorkbookSession
+
     constructor() {
         this.sessionEvent = new Event(<WorkbookSession>this)
         this.statusUIActionEvent = new Event(<WorkbookSession>this)
         this.codeCellEvent = new Event(<WorkbookSession>this)
+        this.nativeUserActionEvent = new Event(<WorkbookSession>this)
 
         this.onSessionEventReceived = this.onSessionEventReceived.bind(this)
         this.onSessionEventsComplete = this.onSessionEventsComplete.bind(this)
+
+        WorkbookSession.currentSession = this
     }
 
     async connect(): Promise<void> {
@@ -132,8 +160,9 @@ export class WorkbookSession {
                 complete: this.onSessionEventsComplete
             })
 
-        if (this.availableWorkbookTargets && this.availableWorkbookTargets.length > 0)
-            this.initializeSession(this.availableWorkbookTargets[0].id)
+        if (this.availableWorkbookTargets && this.availableWorkbookTargets.length > 0) {
+            this.initializeSession(this.availableWorkbookTargets[0].id) // TODO: Should this be awaited?
+        }
     }
 
     async initializeSession(description: SessionDescription | SdkId) {

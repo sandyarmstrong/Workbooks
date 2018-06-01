@@ -12,7 +12,7 @@ import { saveAs } from 'file-saver'
 import { loadTheme } from 'office-ui-fabric-react/lib/Styling';
 
 import { osMac } from '../utils'
-import { WorkbookSession, SessionEvent, SessionEventKind, SdkId } from '../WorkbookSession'
+import { WorkbookSession, SessionEvent, SessionEventKind, SdkId, UserAction, UserActionKind, LoadWorkbookData } from '../WorkbookSession'
 import { WorkbookCommandBar } from './WorkbookCommandBar'
 import { WorkbookEditor } from './WorkbookEditor'
 import { ResultRendererRegistry } from '../ResultRendererRegistry'
@@ -46,6 +46,7 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
 
         this.onDocumentKeyDown = this.onDocumentKeyDown.bind(this)
         this.onSessionEvent = this.onSessionEvent.bind(this)
+        this.onUserAction = this.onUserAction.bind(this)
 
         this.evaluateWorkbook = this.evaluateWorkbook.bind(this)
         this.showPackageDialog = this.showPackageDialog.bind(this)
@@ -68,15 +69,29 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
         console.log("SESSION EVENT")
         if (sessionEvent.kind === SessionEventKind.Ready) {
             this.workspaceAvailable = true
-            if (this.workbookEditor)
+            if (this.workbookEditor) {
                 this.workbookEditor.setUpInitialState()
+            }
+            // TODO: Maybe don't set up state before this on desktop?
+            (window as any).webkit.messageHandlers.workbooks.postMessage("sessionReady")
         } else {
             this.workspaceAvailable = false
         }
     }
 
+    private onUserAction(session: WorkbookSession, userAction: UserAction) {
+        console.log("USER ACTION")
+        if (userAction.kind == UserActionKind.AddPackages) {
+            this.showPackageDialog()
+        } else if (userAction.kind == UserActionKind.LoadWorkbook) {
+            let data = userAction.data as LoadWorkbookData
+            this.loadWorkbookContent(data.fileName, data.contents) // TODO: any reason to await?
+        }
+    }
+
     async componentDidMount() {
         this.shellContext.session.sessionEvent.addListener(this.onSessionEvent)
+        this.shellContext.session.nativeUserActionEvent.addListener(this.onUserAction)
 
         await this.shellContext.session.connect()
 
@@ -87,6 +102,7 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
 
     componentWillUnmount() {
         this.shellContext.session.sessionEvent.removeListener(this.onSessionEvent)
+        this.shellContext.session.nativeUserActionEvent.removeListener(this.onUserAction)
 
         document.addEventListener('keydown', this.onDocumentKeyDown)
 
@@ -190,6 +206,18 @@ export class WorkbookShell extends React.Component<any, WorkbookShellState> {
             const workbookString = new TextDecoder("utf-8").decode(reader.result)
             this.workbook = await loadWorkbookFromString(this.shellContext.session, file.name, workbookString)
         }
+
+        await this.loadCurrentWorkbook()
+    }
+
+    async loadWorkbookContent(fileName: string, workbookContents: string) {
+        this.workbook = await loadWorkbookFromString(this.shellContext.session, fileName, workbookContents)
+        await this.loadCurrentWorkbook()
+    }
+
+    private async loadCurrentWorkbook() {
+        if (!this.workbookEditor || !this.workbook)
+            return
 
         await this.workbookEditor.loadNewContent(this.workbook.markdownContent)
         await this.restoreNuGetPackages()

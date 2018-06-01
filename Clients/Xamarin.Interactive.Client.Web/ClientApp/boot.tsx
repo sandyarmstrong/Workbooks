@@ -15,7 +15,7 @@ import { AppContainer } from 'react-hot-loader';
 import { BrowserRouter } from 'react-router-dom';
 import * as RoutesModule from './routes';
 import { initializeMonaco } from './utils/MonacoLoader';
-import { xiexports } from "./xiexports"
+import { xiexports } from "./xiexports";
 
 let routes = RoutesModule.routes;
 
