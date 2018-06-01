@@ -28,31 +28,31 @@ namespace Xamarin.Interactive.Client.Mac
             this.viewController = viewController;
         }
 
-        //ClientSession session;
-        //public ClientSession Session {
-        //    get {
-        //        if (session != null)
-        //            return session;
+        ClientSession session;
+        public ClientSession Session {
+            get {
+                if (session != null)
+                    return session;
 
-        //        var windowController = viewController.View?.Window?.WindowController;
-        //        if (windowController == null)
-        //            return null;
+                var windowController = viewController.View?.Window?.WindowController;
+                if (windowController == null)
+                    return null;
 
-        //        var sessionWindowController = windowController as SessionWindowController;
-        //        if (sessionWindowController == null) {
-        //            Log.Critical (
-        //                TAG,
-        //                "Should never happen: window controller is non null but" +
-        //                $"not an instance of {nameof (SessionWindowController)}.");
+                var sessionWindowController = windowController as SessionWindowController;
+                if (sessionWindowController == null) {
+                    Log.Critical (
+                        TAG,
+                        "Should never happen: window controller is non null but" +
+                        $"not an instance of {nameof (SessionWindowController)}.");
 
-        //            throw new InvalidCastException (nameof (SessionWindowController));
-        //        }
+                    throw new InvalidCastException (nameof (SessionWindowController));
+                }
 
-        //        session = sessionWindowController.Session;
+                session = sessionWindowController.Session;
 
-        //        return session;
-        //    }
-        //}
+                return session;
+            }
+        }
 
         //bool sessionAvailable;
 

@@ -22,7 +22,7 @@ namespace Xamarin.Interactive.Client.Mac
         public SessionWindowTabViewController TabViewController
             => (SessionWindowTabViewController)ContentViewController;
 
-        //public ClientSession Session { get; private set; }
+        public ClientSession Session { get; private set; }
 
         SessionWindowController (IntPtr handle) : base (handle)
         {
@@ -32,11 +32,11 @@ namespace Xamarin.Interactive.Client.Mac
         {
             MainThread.Ensure ();
 
-            //Session = SessionDocument.InstanceForWindowControllers?.Session;
-            //if (Session == null) {
-            //    Log.Error (TAG, "Unable to get ClientSession from SessionDocument");
-            //    throw new InvalidOperationException ();
-            //}
+            Session = SessionDocument.InstanceForWindowControllers?.Session;
+            if (Session == null) {
+                Log.Error (TAG, "Unable to get ClientSession from SessionDocument");
+                throw new InvalidOperationException ();
+            }
 
             //var viewControllers = new MacClientSessionViewControllers (this);
             //Session.InitializeViewControllers (viewControllers);

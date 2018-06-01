@@ -21,7 +21,7 @@ namespace Xamarin.Interactive.Client.Mac
             adapter = new SessionViewControllerAdapter<SessionSplitViewController> (this);
         }
 
-        //public ClientSession Session => adapter.Session;
+        public ClientSession Session => adapter.Session;
 
         public override void ViewDidAppear ()
         {

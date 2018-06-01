@@ -38,7 +38,7 @@ namespace Xamarin.Interactive.Client.Mac
 
         SessionWindowController sessionWindowController;
 
-        //public ClientSession Session { get; private set; }
+        public ClientSession Session { get; private set; }
 
         public ClientSessionKind SessionKind { get; private set; }
 
@@ -147,7 +147,7 @@ namespace Xamarin.Interactive.Client.Mac
 
                 SessionKind = ((ClientSessionUri)uri).SessionKind;
 
-                //Session = new ClientSession ((ClientSessionUri)uri);
+                Session = new ClientSession ((ClientSessionUri)uri);
             } catch (Exception e) {
                 e.ToUserPresentable (Catalog.Format (Catalog.GetString (
                     "“{0}” could not be opened.",

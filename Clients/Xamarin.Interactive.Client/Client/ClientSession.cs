@@ -14,7 +14,10 @@ using Xamarin.Interactive.I18N;
 
 namespace Xamarin.Interactive.Client
 {
-    sealed class ClientSession : ISimplyObservable<ClientSessionEvent>, IDisposable
+    sealed class ClientSession :
+        ISimplyObservable<ClientSessionEvent>,
+        ISimplyObservable<UserAction>,
+        IDisposable
     {
         const string TAG = nameof (ClientSession);
 
@@ -26,6 +29,7 @@ namespace Xamarin.Interactive.Client
         public CancellationToken CancellationToken => cancellationTokenSource.Token;
 
         readonly Observable<ClientSessionEvent> observable = new Observable<ClientSessionEvent> ();
+        readonly Observable<UserAction> actionObservable = new Observable<UserAction> ();
 
         bool isDisposed;
 
@@ -35,10 +39,10 @@ namespace Xamarin.Interactive.Client
         public bool CanAddPackages => SessionKind == ClientSessionKind.Workbook; // TODO: And check session ready?
 
         // TODO: Do we need this one?
-        // public bool CanEvaluate
-        //     => CompilationWorkspace != null &&
-        //        EvaluationService != null &&
-        //        EvaluationService.CanEvaluate;
+        public bool CanEvaluate => true;
+             //=> CompilationWorkspace != null &&
+                //EvaluationService != null &&
+                //EvaluationService.CanEvaluate;
 
         public ClientSession (ClientSessionUri clientSessionUri)
         {
@@ -60,6 +64,7 @@ namespace Xamarin.Interactive.Client
 
             cancellationTokenSource.Cancel ();
             observable.Observers.OnCompleted ();
+            actionObservable.Observers.OnCompleted ();
         }
 
         // public void InitializeViewControllers (IClientSessionViewControllers viewControllers)
@@ -131,13 +136,49 @@ namespace Xamarin.Interactive.Client
             //PostEvent (observer, ClientSessionEventKind.AgentFeaturesUpdated);
 
             //if (CompilationWorkspace != null)
-                //PostEvent (observer, ClientSessionEventKind.CompilationWorkspaceAvailable);
+            //PostEvent (observer, ClientSessionEventKind.CompilationWorkspaceAvailable);
 
             return subscription;
         }
 
         public IDisposable Subscribe (Action<ClientSessionEvent> observer)
             => observable.Subscribe (new Observer<ClientSessionEvent> (observer));
+
+        #endregion
+
+        #region Action Observable
+
+        public void PostAction (UserActionKind eventKind)
+            => PostAction (new UserAction (this, eventKind));
+
+        public void PostAction (UserAction action)
+            => MainThread.Post (() => actionObservable.Observers.OnNext (action));
+
+        void PostAction (IObserver<UserAction> observer, UserActionKind eventKind)
+            => MainThread.Post (() => observer.OnNext (new UserAction (this, eventKind)));
+
+        public IDisposable Subscribe (IObserver<UserAction> observer)
+        {
+            var subscription = actionObservable.Subscribe (observer);
+
+            //PostEvent (observer, ClientSessionEventKind.SessionAvailable);
+            //PostEvent (observer, ClientSessionEventKind.SessionTitleUpdated);
+
+            //if (Agent.IsConnected)
+            //    PostEvent (observer, ClientSessionEventKind.AgentConnected);
+            //else
+            //    PostEvent (observer, ClientSessionEventKind.AgentDisconnected);
+
+            //PostEvent (observer, ClientSessionEventKind.AgentFeaturesUpdated);
+
+            //if (CompilationWorkspace != null)
+            //PostEvent (observer, ClientSessionEventKind.CompilationWorkspaceAvailable);
+
+            return subscription;
+        }
+
+        public IDisposable Subscribe (Action<UserAction> observer)
+            => actionObservable.Subscribe (new Observer<UserAction> (observer));
 
         #endregion
 
