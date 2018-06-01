@@ -50,6 +50,21 @@ namespace Xamarin.Interactive
             toolsInstallPath = installationPaths?.ToolsInstallPath;
         }
 
+        public string LocateClientServerAssembly ()
+        {
+            if (BuildPath == null)
+                return null;
+            var searchPaths = new [] {
+                Path.Combine (BuildPath, "Clients", "Xamarin.Interactive.Client.Web", "bin")
+            };
+            return LocateFiles (searchPaths, "workbooks-server.dll").FirstOrDefault ();
+        }
+
+        public string LocateProductionClientServer ()
+        {
+            throw new NotImplementedException ();
+        }
+
         public string LocateFormsAssembly (string sdkId)
         {
             if (sdkId == null)

@@ -45,13 +45,16 @@ namespace Xamarin.Interactive.Client
             void HandleOutput (ConsoleRedirection.Segment segment)
             {
                 if (segment.FileDescriptor != ConsoleRedirection.FileDescriptor.Output) {
+#if DEBUG
                     if (segment.FileDescriptor == ConsoleRedirection.FileDescriptor.Error)
                         Console.Error.Write (segment.Data);
+#endif
                     return;
                 }
 
-                // TODO: Remove. This is just for testing convenience right now.
+#if DEBUG
                 Console.Write (segment.Data);
+#endif
 
                 // TODO: Is this ever localized?
                 if (clientServerUri == null) {
@@ -76,27 +79,45 @@ namespace Xamarin.Interactive.Client
                     tcs.TrySetResult (clientServerUri);
             }
 
-            // TODO: Add to InteractiveInstallation
-            FilePath serverAssembly =
-                //@"C:\Users\sandy\xam-git\workbooks\Clients\Xamarin.Interactive.Client.Web\bin\Debug\netcoreapp2.0\workbooks-server.dll";
-                "/Users/sandy/xam-git/workbooks/Clients/Xamarin.Interactive.Client.Web/bin/Debug/netcoreapp2.0/workbooks-server.dll";
+            Exec exec = null;
 
-            // TODO: Support launching packaged server
-            var exec = new Exec (
-                ProcessArguments.FromCommandAndArguments (
-                    "dotnet",
-                    new string [] {
-                        "exec",
-                        serverAssembly,
-                        $"--ppid={Process.GetCurrentProcess ().Id}"
-                    }),
-                ExecFlags.RedirectStdout | ExecFlags.RedirectStderr,
-                HandleOutput,
-                workingDirectory: serverAssembly.ParentDirectory.ParentDirectory.ParentDirectory.ParentDirectory,
-                environmentVariables: new Dictionary<string, string> {
-                    { "ASPNETCORE_ENVIRONMENT", "Development" },
-                });
-            exec.RunAsync ().Forget ();
+#if DEBUG
+            var serverAssembly = (FilePath)InteractiveInstallation.Default.LocateClientServerAssembly ();
+            if (!serverAssembly.IsNull) {
+                exec = new Exec (
+                    ProcessArguments.FromCommandAndArguments (
+                        "dotnet",
+                        new string [] {
+                            "exec",
+                            serverAssembly,
+                            $"--ppid={Process.GetCurrentProcess ().Id}"
+                        }),
+                    ExecFlags.RedirectStdout | ExecFlags.RedirectStderr,
+                    HandleOutput,
+                    workingDirectory: serverAssembly.ParentDirectory.ParentDirectory.ParentDirectory.ParentDirectory,
+                    environmentVariables: new Dictionary<string, string> {
+                        { "ASPNETCORE_ENVIRONMENT", "Development" },
+                    });
+            }
+#else
+            var serverExe = (FilePath)InteractiveInstallation.Default.LocateProductionClientServer ();
+            if (!serverExe.IsNull) {
+                exec = new Exec (
+                    ProcessArguments.FromCommandAndArguments (
+                        serverExe,
+                        new string [] {
+                            $"--ppid={Process.GetCurrentProcess ().Id}"
+                        }),
+                    ExecFlags.RedirectStdout | ExecFlags.RedirectStderr,
+                    HandleOutput,
+                    workingDirectory: serverExe.ParentDirectory); // TODO: What should working dir be?
+            }
+#endif
+
+            if (exec != null)
+                exec.RunAsync ().Forget ();
+            else
+                tcs.TrySetException (new Exception ("Client server not found"));
 
             return tcs.Task;
         }
