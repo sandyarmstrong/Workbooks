@@ -14,6 +14,24 @@ using Xamarin.Interactive.I18N;
 
 namespace Xamarin.Interactive.Client
 {
+    class BrowserTaskRequest
+    {
+        
+    }
+
+    class BrowserTaskService : ISimplyObservable<BrowserTaskRequest>
+    {
+        readonly Observable<BrowserTaskRequest> observable = new Observable<BrowserTaskRequest> ();
+
+        public IDisposable Subscribe (Action<BrowserTaskRequest> nextHandler)
+            => observable.Subscribe (new Observer<BrowserTaskRequest> (nextHandler));
+
+        public IDisposable Subscribe (IObserver<BrowserTaskRequest> observer)
+            => observable.Subscribe (observer);
+
+        //public Task<T> 
+    }
+
     sealed class ClientSession :
         ISimplyObservable<ClientSessionEvent>,
         ISimplyObservable<UserAction>,
@@ -35,6 +53,8 @@ namespace Xamarin.Interactive.Client
 
         public ClientSessionUri Uri { get; }
         public ClientSessionKind SessionKind { get; }
+
+        public BrowserTaskService BrowserTasks { get; } = new BrowserTaskService ();
 
         public bool CanAddPackages => SessionKind == ClientSessionKind.Workbook; // TODO: And check session ready?
 

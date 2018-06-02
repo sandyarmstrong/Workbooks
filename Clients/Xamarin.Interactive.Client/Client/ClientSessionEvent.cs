@@ -54,6 +54,11 @@ namespace Xamarin.Interactive.Client
         }
     }
 
+    //sealed class SaveWorkbookAction : UserAction
+    //{
+    //    public 
+    //}
+
     sealed class LoadWorkbookAction : UserAction
     {
         public LoadWorkbookData Data { get; }

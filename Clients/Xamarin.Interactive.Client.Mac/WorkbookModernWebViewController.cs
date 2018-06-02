@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
-using AppKit;
 using Foundation;
 using ObjCRuntime;
 using WebKit;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
+using Xamarin.Interactive.Client;
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.Serialization;
+
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Xamarin.Interactive.Client.Mac
 {
@@ -45,10 +50,12 @@ namespace Xamarin.Interactive.Client.Mac
             LoadWorkbookAppAsync ().Forget ();
         }
 
+        public Uri ClientServerUri { get; private set; } // TODO: No, not really
+
         async Task LoadWorkbookAppAsync ()
         {
-            var uri = await ClientServerService.SharedInstance.GetUriAsync ();
-            webView.LoadRequest (new NSUrlRequest (new NSUrl (uri.AbsoluteUri)));
+            ClientServerUri = await ClientServerService.SharedInstance.GetUriAsync ();
+            webView.LoadRequest (new NSUrlRequest (new NSUrl (ClientServerUri.AbsoluteUri)));
 
             // TODO: Need to keep disposal ticket?
             Session.Subscribe (HandleUserAction);
@@ -65,7 +72,6 @@ namespace Xamarin.Interactive.Client.Mac
 
         void HandleUserAction (UserAction action)
         {
-            // TODO: Serialization settings and whatnot, enums, blah blah blah
             var actionJson = JsonConvert.SerializeObject (action, jsonSettings);
             webView.EvaluateJavaScript (
                 $"xiexports.sendAction({actionJson});",
@@ -108,6 +114,64 @@ namespace Xamarin.Interactive.Client.Mac
         //}
 
         #endregion
+
+        //public 
+    }
+
+    class TaskMessageHandler : WKScriptMessageHandler
+    {
+        readonly WorkbookModernWebViewController controller;
+
+        public TaskMessageHandler (WorkbookModernWebViewController controller)
+        {
+            this.controller = controller ?? throw new ArgumentNullException (nameof (controller));
+        }
+
+        public override void DidReceiveScriptMessage (
+            WKUserContentController userContentController,
+            WKScriptMessage message)
+        {
+            var jsonData = (string)(NSString)message.Body;
+            var jsonObj = JObject.Parse (jsonData);
+
+            if (!jsonObj.TryGetValue ("taskId", out var taskIdToken))
+                return; // TODO: Log
+
+            var taskId = taskIdToken.ToObject<Guid> ();
+
+        }
+    }
+
+    class SaveAction
+    {
+        public string FilePath { get; set; }
+
+        public string FileContents { get; set; }
+    }
+
+    class SaveResponse
+    {
+        public SaveAction [] SaveActions { get; set; }
+    }
+
+    abstract class Operation
+    {
+        public Guid Id { get; } = Guid.NewGuid ();
+
+        public abstract void HandleResponseData (JToken token);
+    }
+
+    class SaveOperation : Operation
+    {
+        readonly TaskCompletionSource<SaveResponse> taskCompletionSource = new TaskCompletionSource<SaveResponse> ();
+
+        public Task<SaveResponse> Task => taskCompletionSource.Task;
+
+        public override void HandleResponseData (JToken token)
+        {
+            var response = token.ToObject<SaveResponse> ();
+            taskCompletionSource.SetResult (response);
+        }
     }
 
     class ScriptMessageHandler : WKScriptMessageHandler
@@ -119,7 +183,9 @@ namespace Xamarin.Interactive.Client.Mac
             this.controller = controller ?? throw new ArgumentNullException (nameof (controller));
         }
 
-        public override void DidReceiveScriptMessage (WKUserContentController userContentController, WKScriptMessage message)
+        public override void DidReceiveScriptMessage (
+            WKUserContentController userContentController,
+            WKScriptMessage message)
         {
             Log.Debug ("TAG", message.Body.ToString ());
             if (message.Body is NSArray array) {
@@ -140,6 +206,23 @@ namespace Xamarin.Interactive.Client.Mac
                     controller.Session,
                     path,
                     System.IO.File.ReadAllText (path)));
+            }
+        }
+
+        async Task HubStuff ()
+        {
+            var hubUri = new UriBuilder (controller.ClientServerUri) {
+                Path = "/session",
+            }.Uri;
+            var connection = new HubConnectionBuilder ()
+                .WithUrl (hubUri)
+                .Build ();
+            await connection.StartAsync ();
+            var channel = await connection.StreamAsync<InteractiveSessionEvent> ("ObserveSessionEvents");
+            while (await channel.WaitToReadAsync ()) {
+                while (channel.TryRead (out var sessionEvent)) {
+                    Log.Debug ("TAG", $"{sessionEvent}");
+                }
             }
         }
     }
