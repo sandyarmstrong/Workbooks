@@ -76,6 +76,8 @@ namespace Xamarin.Interactive.Client
             Uri = clientSessionUri;
             SessionKind = clientSessionUri.SessionKind;
 
+            HubStuffAsync ().Forget ();
+
             UpdateTitle ();
         }
 
@@ -91,7 +93,7 @@ namespace Xamarin.Interactive.Client
             actionObservable.Observers.OnCompleted ();
         }
 
-        async Task HubStuff ()
+        async Task HubStuffAsync ()
         {
             var hubUri = new UriBuilder (await ClientServerService.SharedInstance.GetUriAsync ()) {
                 Path = "/session",
