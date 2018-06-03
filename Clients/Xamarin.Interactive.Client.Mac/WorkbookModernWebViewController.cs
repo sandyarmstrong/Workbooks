@@ -14,8 +14,6 @@ using Xamarin.Interactive.Client;
 using Xamarin.Interactive.Logging;
 using Xamarin.Interactive.Serialization;
 
-using Microsoft.AspNetCore.SignalR.Client;
-
 namespace Xamarin.Interactive.Client.Mac
 {
     sealed partial class WorkbookModernWebViewController : SessionViewController
@@ -206,23 +204,6 @@ namespace Xamarin.Interactive.Client.Mac
                     controller.Session,
                     path,
                     System.IO.File.ReadAllText (path)));
-            }
-        }
-
-        async Task HubStuff ()
-        {
-            var hubUri = new UriBuilder (controller.ClientServerUri) {
-                Path = "/session",
-            }.Uri;
-            var connection = new HubConnectionBuilder ()
-                .WithUrl (hubUri)
-                .Build ();
-            await connection.StartAsync ();
-            var channel = await connection.StreamAsync<InteractiveSessionEvent> ("ObserveSessionEvents");
-            while (await channel.WaitToReadAsync ()) {
-                while (channel.TryRead (out var sessionEvent)) {
-                    Log.Debug ("TAG", $"{sessionEvent}");
-                }
             }
         }
     }

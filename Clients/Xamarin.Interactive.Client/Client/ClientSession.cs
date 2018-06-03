@@ -9,8 +9,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.SignalR.Client;
+
 using Xamarin.Interactive.Core;
 using Xamarin.Interactive.I18N;
+using Xamarin.Interactive.Logging;
+using Xamarin.Interactive.Session;
 
 namespace Xamarin.Interactive.Client
 {
@@ -85,6 +89,23 @@ namespace Xamarin.Interactive.Client
             cancellationTokenSource.Cancel ();
             observable.Observers.OnCompleted ();
             actionObservable.Observers.OnCompleted ();
+        }
+
+        async Task HubStuff ()
+        {
+            var hubUri = new UriBuilder (await ClientServerService.SharedInstance.GetUriAsync ()) {
+                Path = "/session",
+            }.Uri;
+            var connection = new HubConnectionBuilder ()
+                .WithUrl (hubUri)
+                .Build ();
+            await connection.StartAsync ();
+            var channel = await connection.StreamAsync<InteractiveSessionEvent> ("ObserveSessionEvents");
+            while (await channel.WaitToReadAsync ()) {
+                while (channel.TryRead (out var sessionEvent)) {
+                    Log.Debug ("TAG", $"{sessionEvent}");
+                }
+            }
         }
 
         // public void InitializeViewControllers (IClientSessionViewControllers viewControllers)
