@@ -101,7 +101,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="AgentProcesses\WpfAgentProcess.cs" />
-    <Compile Include="ClientServerService.cs" />
     <Compile Include="Commands\ClearRecentFilesCommand.cs" />
     <Compile Include="Commands\CloseWindowCommand.cs" />
     <Compile Include="Commands\OpenFileCommand.cs" />

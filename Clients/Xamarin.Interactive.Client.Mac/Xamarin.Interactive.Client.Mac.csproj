@@ -77,9 +77,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>2.6.1</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client">
-      <Version>1.0.0-preview2-30131</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -273,9 +270,6 @@
     </Compile>
     <Compile Include="..\..\Agents\Xamarin.Interactive.Mac\NativeExceptionHandler.cs">
       <Link>NativeExceptionHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\Xamarin.Interactive.Client.Windows\ClientServerService.cs">
-      <Link>ClientServerService.cs</Link>
     </Compile>
     <Compile Include="Xamarin.Mac\StoryboardExtensions.cs" />
     <Compile Include="SystemInformation\VisualStudioForMacComponent.cs" />
