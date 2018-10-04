@@ -465,6 +465,24 @@
       <Component Id="System.Diagnostics.DiagnosticSource.dll" Guid="1E23AA5D-D9D4-4C0C-8A8E-714E5F952CF3">
         <File Id="System.Diagnostics.DiagnosticSource.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\System.Diagnostics.DiagnosticSource.dll" />
       </Component>
+      <Component Id="Humanizer.dll" Guid="5A15CE3C-86F1-4DDA-B1A8-0659D1E0E20F">
+        <File Id="Humanizer.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\Humanizer.dll" />
+      </Component>
+      <Component Id="SQLitePCLRaw.batteries_green.dll" Guid="4C685F03-36DA-43EC-B3B8-8B53EAB07DAF">
+        <File Id="SQLitePCLRaw.batteries_green.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\SQLitePCLRaw.batteries_green.dll" />
+      </Component>
+      <Component Id="SQLitePCLRaw.batteries_v2.dll" Guid="ABD76CF8-9BF7-479A-BF5D-AB1DC5A800AC">
+        <File Id="SQLitePCLRaw.batteries_v2.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\SQLitePCLRaw.batteries_v2.dll" />
+      </Component>
+      <Component Id="SQLitePCLRaw.core.dll" Guid="971E13C3-51A4-4903-8331-21215C73534F">
+        <File Id="SQLitePCLRaw.core.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\SQLitePCLRaw.core.dll" />
+      </Component>
+      <Component Id="SQLitePCLRaw.provider.e_sqlite3.dll" Guid="B1274CAC-36B4-421A-9163-B9B0BC9C8061">
+        <File Id="SQLitePCLRaw.provider.e_sqlite3.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\SQLitePCLRaw.provider.e_sqlite3.dll" />
+      </Component>
+      <Component Id="System.Threading.Tasks.Extensions.dll" Guid="9CF5CDE1-2E6E-4E21-81E1-7D224EB4FAEF">
+        <File Id="System.Threading.Tasks.Extensions.dll" Source="$(var.Xamarin.Interactive.Client.Windows.TargetDir)\System.Threading.Tasks.Extensions.dll" />
+      </Component>
     </ComponentGroup>
     <ComponentGroup Id="ClientReplEditorResources" Directory="InspectorResourcesReplEditorFolder">
       <Component Id="editor.css" Guid="C9070752-B1DA-4918-81BD-3DA8869D9A62">
